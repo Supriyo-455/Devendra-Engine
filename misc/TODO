@@ -1,0 +1,9 @@
+TODO(Important):  
+    [Done] Get a window up and running.
+    [Working] Use Modern opengl version in Win32 API
+    [Pending] Seperate Platform independent OpenGL
+
+TODO(Upgrade):
+    [Pending] Implement sound library.
+    [Pending] Implement Logging library.
+    [Pending] Reorganize the glext.h and wglext.h

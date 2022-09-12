@@ -2,3 +2,5 @@
 **.ilk
 **.obj
 **.exe
+build/.vs/
+.vscode/
