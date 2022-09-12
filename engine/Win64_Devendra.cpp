@@ -37,6 +37,31 @@ PFNGLGETSTRINGIPROC glGetStringi;
 	
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);               // Declaration For WndProc
 
+const char* readFile(const char *filePath)                          // For shader loading
+{
+    FILE* shaderFile = fopen(filePath, "r");
+    int fileSize = 0;
+    char* shaderCode = NULL;
+
+    if(!shaderFile)
+    {
+        printf("Could not read file! %s. File doesn't exist!", filePath);
+        return shaderCode;
+    }
+
+    //Getting File Size
+    fseek(shaderFile, 0, SEEK_END);
+    fileSize = ftell(shaderFile);
+    rewind(shaderFile); 
+
+    //Reading From File
+    shaderCode = (char*)malloc(sizeof(char) * (fileSize+1));
+    fread(shaderCode, sizeof(char), fileSize, shaderFile);
+    shaderCode[fileSize] = '\0';
+    fclose(shaderFile);
+    return shaderCode;
+}
+
 void *GetAnyGLFuncAddress(const char *name)             // Platform Specific Function Retrieval
 {
   void *p = (void *)wglGetProcAddress(name);
@@ -143,12 +168,15 @@ int InitGL(GLvoid)                              // All Setup For OpenGL Goes Her
 GLint CompileShaders() 
 {
     // Compiling a fragment shader
-    const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
+    const char *vertexShaderSource = readFile("E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultvertex.glsl");
+    if(vertexShaderSource == NULL)      // Vertex Shader loading from file failed!
+    {
+        char Buffer[512];
+        sprintf(Buffer, "\nERROR::SHADER::VERTEX::LOADING_FAILED_FROM_FILE\n");
+        OutputDebugStringA(Buffer);
+        return FALSE;
+    }
+
     unsigned int vertexShader;
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
@@ -162,18 +190,21 @@ GLint CompileShaders()
     {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
         char Buffer[512];
-        sprintf(Buffer, "\nERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s", infoLog);
+        sprintf(Buffer, "\nERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s", infoLog);
         OutputDebugStringA(Buffer);
         return FALSE;
     }
 
     // Compiling fragment shader
-    const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);\n"
-    "}\0";
+    const char *fragmentShaderSource = readFile("E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultfragment.glsl");
+    if(fragmentShaderSource == NULL)        // fragment Shader loading from file failed!
+    {
+        char Buffer[512];
+        sprintf(Buffer, "\nERROR::SHADER::FRAGMENT::LOADING_FAILED_FROM_FILE\n");
+        OutputDebugStringA(Buffer);
+        return FALSE;
+    }
+
     unsigned int fragmentShader;
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
