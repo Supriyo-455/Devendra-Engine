@@ -1,9 +1,14 @@
 TODO(Important):  
     [Done] Get a window up and running.
-    [Working] Use Modern opengl version in Win32 API
+    [Done] Use Modern opengl version in Win32 API
+    [Done] Implement a triangle with modern opengl and win32 API.
+    [Pending] Some weird memory issue, Free memory after resizing the screen
+    [Pending] Implement a colorful triangle with rainbow color.
+    [Pending] Seperate Fragment shader and Vertex shader to different files
     [Pending] Seperate Platform independent OpenGL
+    [Pending] Implement Logging library.
+    [Pending] Fix Unload Class Error.
 
 TODO(Upgrade):
     [Pending] Implement sound library.
-    [Pending] Implement Logging library.
     [Pending] Reorganize the glext.h and wglext.h

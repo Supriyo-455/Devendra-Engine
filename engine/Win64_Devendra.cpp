@@ -14,6 +14,26 @@ HINSTANCE       hInstance;                          // Holds The Instance Of The
 bool    keys[256];                                  // Array Used For The Keyboard Routine
 bool    active=TRUE;                                // Window Active Flag Set To TRUE By Default
 bool    fullscreen=TRUE;                            // Fullscreen Flag Set To Fullscreen Mode By Default
+
+PFNGLUSEPROGRAMPROC glUseProgram;
+PFNGLGENBUFFERSPROC glGenBuffers;
+PFNGLBINDBUFFERPROC glBindBuffer;
+PFNGLBUFFERDATAPROC glBufferData;
+PFNGLCREATESHADERPROC glCreateShader;
+PFNGLSHADERSOURCEPROC glShaderSource;
+PFNGLCOMPILESHADERPROC glCompileShader; 
+PFNGLGETSHADERIVPROC glGetShaderiv;
+PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
+PFNGLCREATEPROGRAMPROC glCreateProgram;
+PFNGLATTACHSHADERPROC glAttachShader;
+PFNGLLINKPROGRAMPROC glLinkProgram;
+PFNGLGETPROGRAMIVPROC glGetProgramiv;
+PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
+PFNGLDELETESHADERPROC glDeleteShader;
+PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
+PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray; 
+PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
+PFNGLGETSTRINGIPROC glGetStringi;
 	
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);               // Declaration For WndProc
 
@@ -30,8 +50,6 @@ void *GetAnyGLFuncAddress(const char *name)             // Platform Specific Fun
 
   return p;
 }
-
-PFNGLGETSTRINGIPROC glGetStringi = (PFNGLGETSTRINGIPROC) GetAnyGLFuncAddress("glGetStringi");
 
 bool IsExtensionSupported(const char *name)
 {
@@ -67,10 +85,31 @@ void PrintSupportedOpenGLExtensions()
     } 
 }
 
-PFNGLUSEPROGRAMPROC glUseProgram = (PFNGLUSEPROGRAMPROC) GetAnyGLFuncAddress("glUseProgram");
-PFNGLGENBUFFERSPROC glGenBuffers = (PFNGLGENBUFFERSPROC) GetAnyGLFuncAddress("glGenBuffers");
-PFNGLBINDBUFFERPROC glBindBuffer = (PFNGLBINDBUFFERPROC) GetAnyGLFuncAddress("glBindBuffer");
-PFNGLBUFFERDATAPROC glBufferData = (PFNGLBUFFERDATAPROC) GetAnyGLFuncAddress("glBufferData");
+void InitGLFunctions(HDC hDC, HGLRC hRC) 
+{
+    wglCreateContext(hDC);
+    wglMakeCurrent(hDC, hRC);
+
+    glUseProgram = (PFNGLUSEPROGRAMPROC) GetAnyGLFuncAddress("glUseProgram");
+    glGenBuffers = (PFNGLGENBUFFERSPROC) GetAnyGLFuncAddress("glGenBuffers");
+    glBindBuffer = (PFNGLBINDBUFFERPROC) GetAnyGLFuncAddress("glBindBuffer");
+    glBufferData = (PFNGLBUFFERDATAPROC) GetAnyGLFuncAddress("glBufferData");
+    glCreateShader = (PFNGLCREATESHADERPROC) GetAnyGLFuncAddress("glCreateShader");
+    glShaderSource = (PFNGLSHADERSOURCEPROC) GetAnyGLFuncAddress("glShaderSource");
+    glCompileShader = (PFNGLCOMPILESHADERPROC) GetAnyGLFuncAddress("glCompileShader");
+    glGetShaderiv = (PFNGLGETSHADERIVPROC) GetAnyGLFuncAddress("glGetShaderiv");
+    glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC) GetAnyGLFuncAddress("glGetShaderInfoLog");
+    glCreateProgram = (PFNGLCREATEPROGRAMPROC) GetAnyGLFuncAddress("glCreateProgram");
+    glAttachShader = (PFNGLATTACHSHADERPROC) GetAnyGLFuncAddress("glAttachShader");
+    glLinkProgram = (PFNGLLINKPROGRAMPROC) GetAnyGLFuncAddress("glLinkProgram");
+    glGetProgramiv = (PFNGLGETPROGRAMIVPROC) GetAnyGLFuncAddress("glGetProgramiv");
+    glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC) GetAnyGLFuncAddress("glGetProgramInfoLog");
+    glDeleteShader = (PFNGLDELETESHADERPROC) GetAnyGLFuncAddress("glDeleteShader");
+    glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC) GetAnyGLFuncAddress("glVertexAttribPointer");
+    glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC) GetAnyGLFuncAddress("glEnableVertexAttribArray");
+    glDisableVertexAttribArray = (PFNGLDISABLEVERTEXATTRIBARRAYPROC) GetAnyGLFuncAddress("glDisableVertexAttribArray");
+    glGetStringi = (PFNGLGETSTRINGIPROC) GetAnyGLFuncAddress("glGetStringi");
+}
 
 GLvoid ReSizeGLScene(GLsizei width, GLsizei height)                 // Resize And Initialize The GL Window
 {
@@ -93,7 +132,7 @@ GLvoid ReSizeGLScene(GLsizei width, GLsizei height)                 // Resize An
 int InitGL(GLvoid)                              // All Setup For OpenGL Goes Here
 {
     glShadeModel(GL_SMOOTH);                                // Enables Smooth Shading
-    glClearColor(1.0f, 0.0f, 0.0f, 0.0f);                   // Black Background
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);                   
     glClearDepth(1.0f);                                     // Depth Buffer Setup
     glEnable(GL_DEPTH_TEST);                                // Enables Depth Testing
     glDepthFunc(GL_LEQUAL);                                 // The Type Of Depth Test To Do
@@ -101,23 +140,8 @@ int InitGL(GLvoid)                              // All Setup For OpenGL Goes Her
     return TRUE;                                            // Initialization Went OK
 }
 
-int DrawGLScene(GLvoid)                             // Here's Where We Do All The Drawing
+GLint CompileShaders() 
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);         // Clear The Screen And The Depth Buffer
-    glLoadIdentity();                                           // Reset The Current Modelview Matrix
-    
-    float vertices[] = {                                           //  Vertex data
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f,  0.5f, 0.0f
-    };
-
-    // Vertex Buffer Object
-    unsigned int VBO;                                               
-    glGenBuffers(1, &VBO);   
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
     // Compiling a fragment shader
     const char *vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
@@ -134,21 +158,39 @@ int DrawGLScene(GLvoid)                             // Here's Where We Do All Th
     int  success;
     char infoLog[512];
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
     if(!success)
     {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        char Buffer[250];
+        char Buffer[512];
         sprintf(Buffer, "\nERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s", infoLog);
         OutputDebugStringA(Buffer);
+        return FALSE;
     }
 
     // Compiling fragment shader
+    const char *fragmentShaderSource = "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "void main()\n"
+    "{\n"
+    "   FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);\n"
+    "}\0";
     unsigned int fragmentShader;
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragmentShader);
 
+    // Checking fragment shader compilation check
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if(!success)
+    {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        char Buffer[512];
+        sprintf(Buffer, "\nERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s", infoLog);
+        OutputDebugStringA(Buffer);
+        return FALSE;
+    }
+
+    // Binding vertex and fragment shader in shader program
     unsigned int shaderProgram;
     shaderProgram = glCreateProgram();
 
@@ -156,14 +198,36 @@ int DrawGLScene(GLvoid)                             // Here's Where We Do All Th
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
 
-     
+    // check for shader program errors!
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if(!success) {
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        char Buffer[250];
-        sprintf(Buffer, "\nERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s", infoLog);
+        char Buffer[512];
+        sprintf(Buffer, "\nERROR::SHADER::PROGRAM::COMPILATION_FAILED\n%s", infoLog);
         OutputDebugStringA(Buffer);
-    }                        
+        return FALSE;
+    }      
+
+    // Delete the shader objects from cpu memory
+    glDeleteShader(vertexShader);                               
+    glDeleteShader(fragmentShader);
+
+    return shaderProgram; 
+}
+
+int DrawGLScene(unsigned int* VBO)                                         // Here's Where We Do All The Drawing
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);         // Clear The Screen And The Depth Buffer
+    glLoadIdentity();                                           // Reset The Current Modelview Matrix
+    
+    // Linking Vertex Attributes
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    // Draw the triangle !
+    glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+    glDisableVertexAttribArray(0);
 
     return TRUE;                                                // Everything Went OK
 }
@@ -445,6 +509,7 @@ BOOL CreateGLWindow(char* title, int width, int height, int bits, bool fullscree
     SetForegroundWindow(hWnd);                      // Slightly Higher Priority
     SetFocus(hWnd);                             // Sets Keyboard Focus To The Window
     ReSizeGLScene(width, height);                       // Set Up Our Perspective GL Screen
+    InitGLFunctions(hDC, hRC);
 
     if (!InitGL())                              // Initialize Our Newly Created GL Window
     {
@@ -555,6 +620,24 @@ int WINAPI WinMain( HINSTANCE   hInstance,              // Instance
     // Supported OpenGL extension
     PrintSupportedOpenGLExtensions();
 
+    // TODO(supriyo): Pull out the vertex buffer object related code from here!!
+    //  Vertex data
+    float vertices[] = {                                           
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.0f,  0.5f, 0.0f
+    };
+
+    // Vertex Buffer Object
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // compile shaders and get the shader program
+    GLint shaderProgram = CompileShaders();
+    glUseProgram(shaderProgram);
+
     while(!done)                                // Loop That Runs Until done=TRUE
     {
         if (PeekMessage(&msg,NULL,0,0,PM_REMOVE))           // Is There A Message Waiting?
@@ -580,7 +663,7 @@ int WINAPI WinMain( HINSTANCE   hInstance,              // Instance
                 }
                 else                        // Not Time To Quit, Update Screen
                 {
-                    DrawGLScene();              // Draw The Scene
+                    DrawGLScene(&VBO);              // Draw The Scene
                     SwapBuffers(hDC);           // Swap Buffers (Double Buffering)
                 }
             }
