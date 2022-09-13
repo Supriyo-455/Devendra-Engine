@@ -1,14 +1,20 @@
 TODO(Important):  
-    [Done] Get a window up and running.
-    [Done] Use Modern opengl version in Win32 API
-    [Done] Implement a triangle with modern opengl and win32 API.
     [Pending] Some weird memory issue, Free memory after resizing the screen
     [Working] Implement a colorful triangle with rainbow color.
-    [Done] Seperate Fragment shader and Vertex shader to different files
-    [Pending] Seperate Platform independent OpenGL
+    [Pending] Different translational unit for different files.
+    [Pending] Compile seperate files and put them together.
     [Pending] Implement Logging library.
     [Pending] Fix Unload Class Error.
+    [Pending] Remove global window Handles and Opengl Contexts?
+    [Pending] Improve the build.bat file
 
 TODO(Upgrade):
     [Pending] Implement sound library.
     [Pending] Reorganize the glext.h and wglext.h
+
+Completed:
+    [Done] Get a window up and running.
+    [Done] Use Modern opengl version in Win32 API
+    [Done] Implement a triangle with modern opengl and win32 API.
+    [Done] Seperate Fragment shader and Vertex shader to different files
+    [Done] Seperate OpenGL specific codes.
