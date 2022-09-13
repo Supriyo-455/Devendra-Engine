@@ -1,16 +1,18 @@
 TODO(Important):  
-    [Pending] Some weird memory issue, Free memory after resizing the screen
     [Working] Implement a colorful triangle with rainbow color.
-    [Pending] Different translational unit for different files.
-    [Pending] Compile seperate files and put them together.
     [Pending] Implement Logging library.
-    [Pending] Fix Unload Class Error.
+    [Pending] Mouse interface.
+    [Pending] Keyboard interface (Improve the existing one).
+    [Pending] Implement camera.
+    [Pending] Compile seperate files and put them together.
     [Pending] Remove global window Handles and Opengl Contexts?
     [Pending] Improve the build.bat file
 
-TODO(Upgrade):
-    [Pending] Implement sound library.
+TODO(Future Upgrade):
+    [Pending] Implement sound interface.
     [Pending] Reorganize the glext.h and wglext.h
+    [Pending] Some weird memory issue, Free memory after resizing the screen
+    [Pending] Different translational unit for different files.
 
 Completed:
     [Done] Get a window up and running.
@@ -18,3 +20,4 @@ Completed:
     [Done] Implement a triangle with modern opengl and win32 API.
     [Done] Seperate Fragment shader and Vertex shader to different files
     [Done] Seperate OpenGL specific codes.
+    [Done] Fix Unload Class Error.

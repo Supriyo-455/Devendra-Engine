@@ -3,8 +3,8 @@
 const char* readFile(const char *filePath)                          // For shader loading
 {
     FILE* shaderFile;
-    fopen_s(&shaderFile, filePath, "r");
-    int fileSize = 0;
+    fopen_s(&shaderFile, filePath, "rb");
+    GLint fileSize = 0;
     char* shaderCode = NULL;
 
     if(!shaderFile)
@@ -21,8 +21,8 @@ const char* readFile(const char *filePath)                          // For shade
     //Reading From File
     shaderCode = (char*)malloc(sizeof(char) * (fileSize+1));
     fread(shaderCode, sizeof(char), fileSize, shaderFile);
-    shaderCode[fileSize] = '\0';
     fclose(shaderFile);
+    shaderCode[fileSize] = '\0';
     return shaderCode;
 }
 
@@ -61,8 +61,15 @@ void PrintSupportedOpenGLExtensions()
     glGetIntegerv(GL_NUM_EXTENSIONS, &n);
     glGetStringi = (PFNGLGETSTRINGIPROC)wglGetProcAddress("glGetStringi");
     char Buffer[250];
+    
     sprintf_s(Buffer, 250, "\nOpengl Version: %s\n", glGetString(GL_VERSION));
     OutputDebugStringA(Buffer);
+    
+    int nrAttributes;
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+    sprintf_s(Buffer, 250, "\nMaximum %d no.s of vertex attributes supported.\n\n", nrAttributes);
+    OutputDebugStringA(Buffer);
+
     for (GLint i=0; i<n; i++) 
     { 
         const char* extension = 
@@ -97,6 +104,10 @@ void InitGLFunctions(HDC hDC, HGLRC hRC)
     glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC) GetAnyGLFuncAddress("glEnableVertexAttribArray");
     glDisableVertexAttribArray = (PFNGLDISABLEVERTEXATTRIBARRAYPROC) GetAnyGLFuncAddress("glDisableVertexAttribArray");
     glGetStringi = (PFNGLGETSTRINGIPROC) GetAnyGLFuncAddress("glGetStringi");
+    glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC) GetAnyGLFuncAddress("glGenVertexArrays");
+    glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC) GetAnyGLFuncAddress("glBindVertexArray");
+    glUniform4f = (PFNGLUNIFORM4FPROC) GetAnyGLFuncAddress("glUniform4f");
+    glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC) GetAnyGLFuncAddress("glGetUniformLocation");
 }
 
 GLvoid ReSizeGLScene(GLsizei width, GLsizei height)                 // Resize And Initialize The GL Window
@@ -128,10 +139,9 @@ int InitGL(GLvoid)                              // All Setup For OpenGL Goes Her
     return TRUE;                                            // Initialization Went OK
 }
 
-GLint CompileShaders() 
+GLuint CompileShaders(const char *vertexShaderSource, const char *fragmentShaderSource) 
 {
     // Compiling a fragment shader
-    const char *vertexShaderSource = readFile("E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultvertex.glsl");
     if(vertexShaderSource == NULL)      // Vertex Shader loading from file failed!
     {
         char Buffer[512];
@@ -140,7 +150,7 @@ GLint CompileShaders()
         return FALSE;
     }
 
-    unsigned int vertexShader;
+    GLuint vertexShader;
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);   
@@ -153,13 +163,12 @@ GLint CompileShaders()
     {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
         char Buffer[512];
-        sprintf_s(Buffer, 512,"\nERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s", infoLog);
+        sprintf_s(Buffer, 512,"\nERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s", infoLog);
         OutputDebugStringA(Buffer);
         return FALSE;
     }
 
     // Compiling fragment shader
-    const char *fragmentShaderSource = readFile("E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultfragment.glsl");
     if(fragmentShaderSource == NULL)        // fragment Shader loading from file failed!
     {
         char Buffer[512];
@@ -168,7 +177,7 @@ GLint CompileShaders()
         return FALSE;
     }
 
-    unsigned int fragmentShader;
+    GLuint fragmentShader;
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragmentShader);
@@ -185,7 +194,7 @@ GLint CompileShaders()
     }
 
     // Binding vertex and fragment shader in shader program
-    unsigned int shaderProgram;
+    GLuint shaderProgram;
     shaderProgram = glCreateProgram();
 
     glAttachShader(shaderProgram, vertexShader);
@@ -209,19 +218,21 @@ GLint CompileShaders()
     return shaderProgram; 
 }
 
-int DrawGLScene(unsigned int* VBO)                                         // Here's Where We Do All The Drawing
+int DrawGLScene(GLuint ShaderProgram, GLuint VAO, float greenValue) // Here's Where We Do All The Drawing
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);         // Clear The Screen And The Depth Buffer
     glLoadIdentity();                                           // Reset The Current Modelview Matrix
     
-    // Linking Vertex Attributes
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    int vertexColorLocation = glGetUniformLocation(ShaderProgram, "ourColor");
+    glUseProgram(ShaderProgram);
+    glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
-    // Draw the triangle !
-    glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
-    glDisableVertexAttribArray(0);
+    // Linking Vertex Attributes
+    glBindVertexArray(VAO);
+    
+    // Drawing
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 
     return TRUE;                                                // Everything Went OK
 }

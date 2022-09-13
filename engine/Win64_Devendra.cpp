@@ -4,6 +4,10 @@
 #include "libs\glext.h"                             // OpenGL 1.2 and above compatibility profile and extension interfaces
 #include "libs\wglext.h"                            // WGL extension interfaces.
 #include <stdio.h>
+#include "libs\Win32_keycodes.h"
+#include <math.h>
+
+#define PI 3.1415926535897932384626433832795028841971f
 
 #include "include/Win32_GL.h"
 #include "src/Win32_GL.cpp"
@@ -16,7 +20,8 @@ HINSTANCE       hInstance;                          // Holds The Instance Of The
 bool    keys[256];                                  // Array Used For The Keyboard Routine
 bool    active=TRUE;                                // Window Active Flag Set To TRUE By Default
 bool    fullscreen=TRUE;                            // Fullscreen Flag Set To Fullscreen Mode By Default
-	
+bool    wireframe = false;                          // For wireframing
+
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);               // Declaration For WndProc
 
 GLvoid KillGLWindow(GLvoid)                         // Properly Kill The Window
@@ -77,7 +82,7 @@ GLvoid KillGLWindow(GLvoid)                         // Properly Kill The Window
         );
         hWnd=NULL;                          // Set hWnd To NULL
     }
-    if (!UnregisterClass("OpenGL",hInstance))               // Are We Able To Unregister Class
+    if (!UnregisterClass("Devendra Engine",hInstance))               // Are We Able To Unregister Class
     {
         MessageBox(
             NULL,
@@ -420,22 +425,46 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
 
     // TODO(supriyo): Pull out the vertex buffer object related code from here!!
     //  Vertex data
-    float vertices[] = {                                           
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f,  0.5f, 0.0f
+    float vertices[] = {
+        0.5f,  0.5f, 0.0f,  // top right
+        0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  // bottom left
+        -0.5f,  0.5f, 0.0f   // top left 
     };
+    GLuint indices[] = {  // note that we start from 0!
+        0, 1, 3,   // first triangle
+        1, 2, 3    // second triangle
+    };  
+    
+    // Vertex Array Object
+    GLuint VAO;
+    glGenVertexArrays(1, &VAO); 
+    glBindVertexArray(VAO);
 
     // Vertex Buffer Object
-    unsigned int VBO;
+    GLuint VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // Element Buffer Object
+    GLuint EBO;
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);   
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 
     // compile shaders and get the shader program
-    GLint shaderProgram = CompileShaders();
-    glUseProgram(shaderProgram);
+	const char* vertexShader = readFile("E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultvertex.glsl");
+	const char* fragmentShader = readFile("E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultfragment.glsl");
+    GLuint shaderProgram = CompileShaders(vertexShader, fragmentShader);
+    glUseProgram(shaderProgram); 
 
+    float timeValue = 0.0f; 
     while(!done)                                // Loop That Runs Until done=TRUE
     {
         if (PeekMessage(&msg,NULL,0,0,PM_REMOVE))           // Is There A Message Waiting?
@@ -461,10 +490,25 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
                 }
                 else                        
                 {
-                    DrawGLScene(&VBO);              
+                    if(wireframe)
+                    {
+                        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                    }
+                    else
+                    {
+                        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                    }
+                    timeValue += 2.0f * PI * 1.0f / 0.005f;
+                    float greenValue = (float) sin(timeValue) + 0.5f;
+                    DrawGLScene(shaderProgram, VAO, greenValue);              
                     SwapBuffers(hDC);           
                 }
             }
+            if(keys[VK_KEY_W])
+            {
+               wireframe = !wireframe;
+            }
+
             if (keys[VK_F1])                    
             {
                 keys[VK_F1]=FALSE;              
