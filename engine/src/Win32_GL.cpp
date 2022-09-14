@@ -106,8 +106,13 @@ void InitGLFunctions(HDC hDC, HGLRC hRC)
     glGetStringi = (PFNGLGETSTRINGIPROC) GetAnyGLFuncAddress("glGetStringi");
     glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC) GetAnyGLFuncAddress("glGenVertexArrays");
     glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC) GetAnyGLFuncAddress("glBindVertexArray");
+    glUniform1f = (PFNGLUNIFORM1FPROC) GetAnyGLFuncAddress("glUniform1f");
+    glUniform2f = (PFNGLUNIFORM2FPROC) GetAnyGLFuncAddress("glUniform2f");
+    glUniform3f = (PFNGLUNIFORM3FPROC) GetAnyGLFuncAddress("glUniform3f");
     glUniform4f = (PFNGLUNIFORM4FPROC) GetAnyGLFuncAddress("glUniform4f");
     glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC) GetAnyGLFuncAddress("glGetUniformLocation");
+    wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC) GetAnyGLFuncAddress("wglSwapIntervalEXT");
+    wglGetSwapIntervalEXT = (PFNWGLGETSWAPINTERVALEXTPROC) GetAnyGLFuncAddress("wglGetSwapIntervalEXT");
 }
 
 GLvoid ReSizeGLScene(GLsizei width, GLsizei height)                 // Resize And Initialize The GL Window
@@ -218,20 +223,25 @@ GLuint CompileShaders(const char *vertexShaderSource, const char *fragmentShader
     return shaderProgram; 
 }
 
-int DrawGLScene(GLuint ShaderProgram, GLuint VAO, float greenValue) // Here's Where We Do All The Drawing
+int DrawGLScene(GLuint ShaderProgram, GLuint VAO, int indiciesCount, float timeValue) // Here's Where We Do All The Drawing
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);         // Clear The Screen And The Depth Buffer
     glLoadIdentity();                                           // Reset The Current Modelview Matrix
     
+    float greenValue = (float) sin(timeValue*1.5);
+    
     int vertexColorLocation = glGetUniformLocation(ShaderProgram, "ourColor");
+    int Uniform_time_Location = glGetUniformLocation(ShaderProgram, "time");
+    
     glUseProgram(ShaderProgram);
     glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+    glUniform1f(Uniform_time_Location, timeValue);
 
     // Linking Vertex Attributes
     glBindVertexArray(VAO);
     
     // Drawing
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, indiciesCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
     return TRUE;                                                // Everything Went OK

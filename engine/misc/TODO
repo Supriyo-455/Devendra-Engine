@@ -13,6 +13,7 @@ TODO(Future Upgrade):
     [Pending] Reorganize the glext.h and wglext.h
     [Pending] Some weird memory issue, Free memory after resizing the screen
     [Pending] Different translational unit for different files.
+    
 
 Completed:
     [Done] Get a window up and running.
@@ -21,3 +22,5 @@ Completed:
     [Done] Seperate Fragment shader and Vertex shader to different files
     [Done] Seperate OpenGL specific codes.
     [Done] Fix Unload Class Error.
+    [Done] Fix inconsistent framerate and Window messages.
+    [Done] Vsync and color transition rectangle example.

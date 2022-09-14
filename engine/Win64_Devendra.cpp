@@ -6,11 +6,26 @@
 #include <stdio.h>
 #include "libs\Win32_keycodes.h"
 #include <math.h>
-
-#define PI 3.1415926535897932384626433832795028841971f
+#include <stdint.h>
 
 #include "include/Win32_GL.h"
 #include "src/Win32_GL.cpp"
+
+#define PI 3.1415926535897932384626433832795028841971f
+
+typedef uint8_t uint8;
+typedef uint16_t uint16;
+typedef uint32_t uint32;
+typedef uint64_t uint64;
+
+typedef int8_t int8;
+typedef int16_t int16;
+typedef int32_t int32;
+typedef int64_t int64;
+typedef int32 bool32;
+
+typedef float real32;
+typedef double real64;
 
 HGLRC           hRC=NULL;                           // Permanent Rendering Context
 HDC             hDC=NULL;                           // Private GDI Device Context
@@ -355,6 +370,11 @@ LRESULT CALLBACK WndProc(
             }
             break;                          // Exit
         }
+        case WM_LBUTTONDOWN:
+        {
+            wireframe = !wireframe;
+            return 0;
+        }
         case WM_CLOSE:                          // Did We Receive A Close Message?
         {
             PostQuitMessage(0);                 // Send A Quit Message
@@ -376,10 +396,12 @@ LRESULT CALLBACK WndProc(
             return 0;                       // Jump Back
         }
     }
+
      // Pass All Unhandled Messages To DefWindowProc
     return DefWindowProc(wHandle,uMsg,wParam,lParam);
 }
 
+double counter;
 int WINAPI WinMain(HINSTANCE   Instance,              // Instance
             HINSTANCE   hPrevInstance,              // Previous Instance
             LPSTR       lpCmdLine,              // Command Line Parameters
@@ -426,15 +448,16 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     // TODO(supriyo): Pull out the vertex buffer object related code from here!!
     //  Vertex data
     float vertices[] = {
-        0.5f,  0.5f, 0.0f,  // top right
-        0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left 
-    };
+        // positions         // colors
+         0.5f,  -0.5f,  0.0f,   1.0f, 0.0f, 0.0f,   // bottom right
+        -0.5f,  -0.5f,  0.0f,   0.0f, 1.0f, 0.0f,   // bottom left
+         0.0f,   0.5f,  0.0f,   0.0f, 0.0f, 1.0f    // top 
+    }; 
     GLuint indices[] = {  // note that we start from 0!
-        0, 1, 3,   // first triangle
-        1, 2, 3    // second triangle
-    };  
+        0, 1, 2
+    };
+    int verticesCount = (int)(sizeof(vertices)/sizeof(vertices[0]));
+    int indiciesCount = (int)(sizeof(indices)/sizeof(indices[0]));  
     
     // Vertex Array Object
     GLuint VAO;
@@ -446,8 +469,12 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // Element Buffer Object
     GLuint EBO;
@@ -455,72 +482,100 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);   
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, verticesCount, GL_FLOAT, GL_FALSE, verticesCount * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     // compile shaders and get the shader program
 	const char* vertexShader = readFile("E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultvertex.glsl");
 	const char* fragmentShader = readFile("E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultfragment.glsl");
     GLuint shaderProgram = CompileShaders(vertexShader, fragmentShader);
-    glUseProgram(shaderProgram); 
+    glUseProgram(shaderProgram);
 
-    float timeValue = 0.0f; 
+    // Vsync
+    // 0 - off, 1 - on
+    wglSwapIntervalEXT(1);
+
+    LARGE_INTEGER LastCounter;
+	QueryPerformanceCounter(&LastCounter);
+	uint64 LastCycleCount = __rdtsc();
+    float greenValue = 0.0f;
     while(!done)                                // Loop That Runs Until done=TRUE
-    {
-        if (PeekMessage(&msg,NULL,0,0,PM_REMOVE))           // Is There A Message Waiting?
+    {   
+        LARGE_INTEGER PerformanceCountFrequencyResult;
+	    QueryPerformanceFrequency(&PerformanceCountFrequencyResult);
+	    int64 PerformanceCountFrequency = PerformanceCountFrequencyResult.QuadPart;
+
+        while (PeekMessage(&msg,NULL,0,0,PM_REMOVE))           // Is There A Message Waiting?
         {
             if (msg.message==WM_QUIT)               // Have We Received A Quit Message?
             {
-                done=TRUE;                  // If So done=TRUE
+                done=TRUE;                    // If So done=TRUE
             }
-            else                            // If Not, Deal With Window Messages
-            {
-                TranslateMessage(&msg);             // Translate The Message
-                DispatchMessage(&msg);              // Dispatch The Message
-            }
+            TranslateMessage(&msg);             // Translate The Message
+            DispatchMessage(&msg);
         }
-        else                                // If There Are No Messages
+        // Draw The Scene.  Watch For ESC Key And Quit Messages From DrawGLScene()
+        if (keys[VK_ESCAPE])                
         {
-            // Draw The Scene.  Watch For ESC Key And Quit Messages From DrawGLScene()
-            if (active)                     
-            {
-                if (keys[VK_ESCAPE])                
-                {
-                    done=TRUE;              
-                }
-                else                        
-                {
-                    if(wireframe)
-                    {
-                        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                    }
-                    else
-                    {
-                        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-                    }
-                    timeValue += 2.0f * PI * 1.0f / 0.005f;
-                    float greenValue = (float) sin(timeValue) + 0.5f;
-                    DrawGLScene(shaderProgram, VAO, greenValue);              
-                    SwapBuffers(hDC);           
-                }
-            }
-            if(keys[VK_KEY_W])
-            {
-               wireframe = !wireframe;
-            }
+            done=TRUE;              
+        }
 
-            if (keys[VK_F1])                    
+        if(keys[VK_KEY_W])
+        {
+            wireframe = !wireframe;
+        }
+
+        if (keys[VK_F1])                    
+        {
+            keys[VK_F1]=FALSE;              
+            KillGLWindow();                 
+            fullscreen=!fullscreen;             
+            // Recreate Our OpenGL Window
+            if (!CreateGLWindow("Devendra Engine",640,480,16,fullscreen))
             {
-                keys[VK_F1]=FALSE;              
-                KillGLWindow();                 
-                fullscreen=!fullscreen;             
-                // Recreate Our OpenGL Window
-                if (!CreateGLWindow("Devendra Engine",640,480,16,fullscreen))
-                {
-                    return 0;              
-                }
+                return 0;              
             }
         }
+
+        //////////// Drawing to the Screen /////////////////
+        if(wireframe)
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+        else
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+        DrawGLScene(shaderProgram, VAO, indiciesCount, greenValue);              
+        SwapBuffers(hDC);
+        ////////////////////////////////////////////////////
+        
+        uint64 EndCycleCount = __rdtsc();
+        LARGE_INTEGER EndCounter;
+		QueryPerformanceCounter(&EndCounter);
+
+		// TODO: Display the value here
+		uint64 CycleElapsed = EndCycleCount - LastCycleCount;
+		int64 CounterElapsed = EndCounter.QuadPart - LastCounter.QuadPart;
+		real32 MSPerFrame = (real32)((1000.0f * (real32)CounterElapsed) / (real32)PerformanceCountFrequency);
+		real32 FPS = (real32)PerformanceCountFrequency / (real32)CounterElapsed;
+		real32 MegaCycles = (real32)(CycleElapsed / (1000.0f * 1000.0f));
+        char* vsync = "OFF";
+        if(wglGetSwapIntervalEXT())
+        {
+            vsync = "ON";
+        }
+
+		char Buffer[250];
+		// TODO: Optimize this wsprintf or replace it with something else
+		sprintf_s(Buffer, 250, "Miliseconds/Frame : %fms & FPS: %f Mega CyclesElapsed: %fmc & Vsync=%s\n", MSPerFrame, FPS, MegaCycles, vsync);
+		OutputDebugStringA(Buffer);
+
+		LastCounter = EndCounter;
+		LastCycleCount = EndCycleCount;
+
+        counter += 0.05f;
+        greenValue = (float) (sin(counter) / 2.0f + 0.5f);
     }
     // Shutdown
     KillGLWindow();                                 
