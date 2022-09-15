@@ -30,11 +30,20 @@ typedef double real64;
 #include <time.h>
 #include <math.h>
 
+#include "include/Devendra_Utils.h"
+#include "src/Devendra_Utils.cpp"
+
+#include "include/Devendra_Win32_GL_EXT.h"
+#include "src/Devendra_Win32_GL_EXT.cpp"
+
 #include "include/Win32_GL.h"
 #include "src/Win32_GL.cpp"
 
 // #include "include/Devendra_Logger.h"
 // #include "src/Devendra_Logger.cpp"
+
+#include "include/Devendra_Shader.h"
+#include "src/Devendra_Shader.cpp"
 
 
 HGLRC           hRC=NULL;                           // Permanent Rendering Context
@@ -411,7 +420,7 @@ LRESULT CALLBACK WndProc(
     return DefWindowProc(wHandle,uMsg,wParam,lParam);
 }
 
-double counter;
+float counter;
 int WINAPI WinMain(HINSTANCE   Instance,              // Instance
                     HINSTANCE   hPrevInstance,              // Previous Instance
                     LPSTR       lpCmdLine,              // Command Line Parameters
@@ -498,10 +507,17 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     glEnableVertexAttribArray(0);
 
     // compile shaders and get the shader program
-	const char* vertexShader = readFile("E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultvertex.glsl");
-	const char* fragmentShader = readFile("E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultfragment.glsl");
-    uint32 shaderProgram = CompileShaders(vertexShader, fragmentShader);
-    glUseProgram(shaderProgram);
+	// const char* vertexShader = readFile("E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultvertex.glsl");
+	// const char* fragmentShader = readFile("E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultfragment.glsl");
+    // uint32 shaderProgram = CompileShaders(vertexShader, fragmentShader);
+    // glUseProgram(shaderProgram);
+
+    Devendra_Shader simple_shader;
+    simple_shader = {};
+    CompileFragmentShader(&simple_shader, "E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultfragment.glsl");
+    CompileVertexShader(&simple_shader, "E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultvertex.glsl");
+    CompileShaderProgram(&simple_shader);
+    useShader(&simple_shader);
 
     // Vsync
     // 0 - off, 1 - on
@@ -558,7 +574,9 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
         {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
-        DrawGLScene(shaderProgram, VAO, indiciesCount, greenValue);              
+        useShader(&simple_shader);
+        setUniform1f(&simple_shader, "time", counter);
+        DrawGLScene(VAO, indiciesCount);              
         SwapBuffers(hDC);
         ////////////////////////////////////////////////////
         
@@ -586,7 +604,7 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
 		LastCounter = EndCounter;
 		LastCycleCount = EndCycleCount;
 
-        counter += 0.05f;
+        counter += 0.02f;
         greenValue = (real32) (sin(counter) / 2.0f + 0.5f);
     }
     // Shutdown

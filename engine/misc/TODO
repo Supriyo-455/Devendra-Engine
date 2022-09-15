@@ -1,12 +1,13 @@
 TODO(Important):
     [Pending] Implement a build system
     [Pending] Improve the build.bat file
-    [Pending] Compile seperate files and put them together.
+    [Pending] Refactor the codebase.
     [Pending] Implement Logging library.
     [Pending] Mouse interface.
     [Pending] Keyboard interface (Improve the existing one).
     [Pending] Implement camera.
     [Pending] Remove global window Handles and Opengl Contexts?
+    [Pending] Complete the Devendra_Shader.cpp file
 
 TODO(Future Upgrade):
     [Pending] Implement sound interface.

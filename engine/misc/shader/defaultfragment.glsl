@@ -8,5 +8,6 @@ uniform float time;
 void main(void) {
     float wave = sin(time);
     // Put it all together
+    if(wave < 0.001) wave *= -1;
     FragColor = vertexColor*wave;
 }
