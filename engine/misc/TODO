@@ -1,12 +1,12 @@
-TODO(Important):  
-    [Working] Implement a colorful triangle with rainbow color.
+TODO(Important):
+    [Pending] Implement a build system
+    [Pending] Improve the build.bat file
+    [Pending] Compile seperate files and put them together.
     [Pending] Implement Logging library.
     [Pending] Mouse interface.
     [Pending] Keyboard interface (Improve the existing one).
     [Pending] Implement camera.
-    [Pending] Compile seperate files and put them together.
     [Pending] Remove global window Handles and Opengl Contexts?
-    [Pending] Improve the build.bat file
 
 TODO(Future Upgrade):
     [Pending] Implement sound interface.
@@ -14,7 +14,6 @@ TODO(Future Upgrade):
     [Pending] Some weird memory issue, Free memory after resizing the screen
     [Pending] Different translational unit for different files.
     
-
 Completed:
     [Done] Get a window up and running.
     [Done] Use Modern opengl version in Win32 API
@@ -24,3 +23,4 @@ Completed:
     [Done] Fix Unload Class Error.
     [Done] Fix inconsistent framerate and Window messages.
     [Done] Vsync and color transition rectangle example.
+    [Done] Implement a colorful triangle with rainbow color.

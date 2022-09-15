@@ -31,13 +31,13 @@ PFNWGLGETSWAPINTERVALEXTPROC wglGetSwapIntervalEXT;
 
 const char* readFile(const char *filePath);
 void *GetAnyGLFuncAddress(const char *name);
-bool IsExtensionSupported(const char *extension_name);
+bool32 IsExtensionSupported(const char *extension_name);
 void PrintSupportedOpenGLExtensions();
 void InitGLFunctions(HDC hDC, HGLRC hRC);
-GLvoid ReSizeGLScene(GLsizei width, GLsizei height);
-int InitGL(GLvoid);
-GLint CompileShaders();
-int DrawGLScene(GLuint ShaderProgram, GLuint VAO, int indiciesCount, float time);
+void ReSizeGLScene(uint32 width, uint32 height);
+bool32 InitGL(void);
+int32 CompileShaders(const char *vertexShader, const char *fragmentShader);
+int32 DrawGLScene(uint32 ShaderProgram, uint32 VAO, uint32 indiciesCount, real32 time);
 
 #define _WIN32_GL_H
 #endif

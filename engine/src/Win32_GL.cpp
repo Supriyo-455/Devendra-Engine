@@ -4,7 +4,7 @@ const char* readFile(const char *filePath)                          // For shade
 {
     FILE* shaderFile;
     fopen_s(&shaderFile, filePath, "rb");
-    GLint fileSize = 0;
+    uint32 fileSize = 0;
     char* shaderCode = NULL;
 
     if(!shaderFile)
@@ -40,11 +40,11 @@ void *GetAnyGLFuncAddress(const char *name)             // Platform Specific Fun
   return p;
 }
 
-bool IsExtensionSupported(const char *name)
+bool32 IsExtensionSupported(const char *name)
 {
-    GLint n=0; 
+    int32 n=0; 
     glGetIntegerv(GL_NUM_EXTENSIONS, &n); 
-    for (GLint i=0; i<n; i++) 
+    for (int32 i=0; i<n; i++) 
     { 
         const char* extension = (const char*)glGetStringi(GL_EXTENSIONS, i);
         if (!strcmp(name, extension)) 
@@ -57,7 +57,7 @@ bool IsExtensionSupported(const char *name)
 
 void PrintSupportedOpenGLExtensions()
 {
-    GLint n=0; 
+    int32 n=0; 
     glGetIntegerv(GL_NUM_EXTENSIONS, &n);
     glGetStringi = (PFNGLGETSTRINGIPROC)wglGetProcAddress("glGetStringi");
     char Buffer[250];
@@ -65,12 +65,12 @@ void PrintSupportedOpenGLExtensions()
     sprintf_s(Buffer, 250, "\nOpengl Version: %s\n", glGetString(GL_VERSION));
     OutputDebugStringA(Buffer);
     
-    int nrAttributes;
+    int32 nrAttributes;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
     sprintf_s(Buffer, 250, "\nMaximum %d no.s of vertex attributes supported.\n\n", nrAttributes);
     OutputDebugStringA(Buffer);
 
-    for (GLint i=0; i<n; i++) 
+    for (int32 i=0; i<n; i++) 
     { 
         const char* extension = 
             (const char*)glGetStringi(GL_EXTENSIONS, i);
@@ -115,7 +115,7 @@ void InitGLFunctions(HDC hDC, HGLRC hRC)
     wglGetSwapIntervalEXT = (PFNWGLGETSWAPINTERVALEXTPROC) GetAnyGLFuncAddress("wglGetSwapIntervalEXT");
 }
 
-GLvoid ReSizeGLScene(GLsizei width, GLsizei height)                 // Resize And Initialize The GL Window
+void ReSizeGLScene(int32 width, int32 height)                 // Resize And Initialize The GL Window
 {
     if (height==0)                              // Prevent A Divide By Zero By
     {
@@ -133,7 +133,7 @@ GLvoid ReSizeGLScene(GLsizei width, GLsizei height)                 // Resize An
     glLoadIdentity();                               // Reset The Modelview Matrix
 }
 
-int InitGL(GLvoid)                              // All Setup For OpenGL Goes Here
+bool32 InitGL(void)                              // All Setup For OpenGL Goes Here
 {
     glShadeModel(GL_SMOOTH);                                // Enables Smooth Shading
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);                   
@@ -144,7 +144,7 @@ int InitGL(GLvoid)                              // All Setup For OpenGL Goes Her
     return TRUE;                                            // Initialization Went OK
 }
 
-GLuint CompileShaders(const char *vertexShaderSource, const char *fragmentShaderSource) 
+int32 CompileShaders(const char *vertexShaderSource, const char *fragmentShaderSource) 
 {
     // Compiling a fragment shader
     if(vertexShaderSource == NULL)      // Vertex Shader loading from file failed!
@@ -155,13 +155,13 @@ GLuint CompileShaders(const char *vertexShaderSource, const char *fragmentShader
         return FALSE;
     }
 
-    GLuint vertexShader;
+    uint32 vertexShader;
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);   
 
     // Checking vertex shader compilation check
-    int  success;
+    bool32  success;
     char infoLog[512];
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
     if(!success)
@@ -182,7 +182,7 @@ GLuint CompileShaders(const char *vertexShaderSource, const char *fragmentShader
         return FALSE;
     }
 
-    GLuint fragmentShader;
+    uint32 fragmentShader;
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragmentShader);
@@ -199,7 +199,7 @@ GLuint CompileShaders(const char *vertexShaderSource, const char *fragmentShader
     }
 
     // Binding vertex and fragment shader in shader program
-    GLuint shaderProgram;
+    uint32 shaderProgram;
     shaderProgram = glCreateProgram();
 
     glAttachShader(shaderProgram, vertexShader);
@@ -223,18 +223,13 @@ GLuint CompileShaders(const char *vertexShaderSource, const char *fragmentShader
     return shaderProgram; 
 }
 
-int DrawGLScene(GLuint ShaderProgram, GLuint VAO, int indiciesCount, float timeValue) // Here's Where We Do All The Drawing
+int32 DrawGLScene(uint32 ShaderProgram, uint32 VAO, uint32 indiciesCount, real32 timeValue) // Here's Where We Do All The Drawing
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);         // Clear The Screen And The Depth Buffer
     glLoadIdentity();                                           // Reset The Current Modelview Matrix
-    
-    float greenValue = (float) sin(timeValue*1.5);
-    
-    int vertexColorLocation = glGetUniformLocation(ShaderProgram, "ourColor");
-    int Uniform_time_Location = glGetUniformLocation(ShaderProgram, "time");
+    int32 Uniform_time_Location = glGetUniformLocation(ShaderProgram, "time");
     
     glUseProgram(ShaderProgram);
-    glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
     glUniform1f(Uniform_time_Location, timeValue);
 
     // Linking Vertex Attributes
