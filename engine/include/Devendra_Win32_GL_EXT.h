@@ -29,6 +29,7 @@ PFNGLUNIFORM4FPROC glUniform4f;
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 PFNWGLGETSWAPINTERVALEXTPROC wglGetSwapIntervalEXT;
+PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
 
 void *GetAnyGLFuncAddress(const char *name);
 bool32 IsExtensionSupported(const char *extension_name);

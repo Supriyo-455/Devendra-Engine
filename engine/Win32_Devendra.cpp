@@ -19,12 +19,16 @@ typedef double real64;
 #define global static;
 
 #include <windows.h>                              // Header File For Windows
-#include <gl\gl.h>                                // Header File For The OpenGL32 Library
-#include <gl\glu.h>                               // Header File For The GLu32 Library
-#include "libs\glext.h"                             // OpenGL 1.2 and above compatibility profile and extension interfaces
-#include "libs\wglext.h"                            // WGL extension interfaces.
+#include <gl/gl.h>                                // Header File For The OpenGL32 Library
+#include <gl/glu.h>                               // Header File For The GLu32 Library
+#include "libs/glext.h"                             // OpenGL 1.2 and above compatibility profile and extension interfaces
+#include "libs/wglext.h"                            // WGL extension interfaces.
 #include <stdio.h>
-#include "libs\Win32_keycodes.h"
+#include "libs/Win32_keycodes.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "libs/stb_image.h"
+
 #include <stdarg.h>
 #include <stdbool.h>
 #include <time.h>
@@ -467,16 +471,47 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     // TODO(supriyo): Pull out the vertex buffer object related code from here!!
     //  Vertex data
     real32 vertices[] = {
-        // positions         // colors
-         0.5f,  -0.5f,  0.0f,   1.0f, 0.0f, 0.0f,   // bottom right
-        -0.5f,  -0.5f,  0.0f,   0.0f, 1.0f, 0.0f,   // bottom left
-         0.5f,   0.5f,  0.0f,   0.0f, 0.0f, 1.0f,    // top left
-        -0.5f,   0.5f,  0.0f,   0.0f, 1.0f, 1.0f,   // top right
+        // positions         // colors              // Tex coords
+         0.5f,  -0.5f,  0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f,  // lower-right corner
+        -0.5f,  -0.5f,  0.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,  // lower-left corner  
+         0.5f,   0.5f,  0.0f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f,   // top-left corner
+        -0.5f,   0.5f,  0.0f,   0.0f, 1.0f, 1.0f,   0.0f, 1.0f    // top-right corner
     }; 
     uint32 indices[] = {  // note that we start from 0!
         0, 1, 2,
         2, 3, 1
     };
+   
+    uint32 texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    int32 width, height, nrChannels;
+    uint8 *data = stbi_load("E:\\personal project\\Devendra-Engine\\engine\\misc\\textures\\wall.jpg", &width, &height, &nrChannels, 0);
+    if(data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        MessageBox
+            (
+                NULL,
+                "Failed to load the texture format!", 
+                "Error occured!",
+                MB_OK|MB_ICONERROR
+            );
+    }
+    stbi_image_free(data);
+
+    // real32 color = {1.0f, 0.0f, 0.0f, 1.0f};
+    // glTexParameterfv();
+
     uint32 verticesCount = (uint32)(sizeof(vertices)/sizeof(vertices[0]));
     uint32 indiciesCount = (uint32)(sizeof(indices)/sizeof(indices[0]));  
     
@@ -490,12 +525,16 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(real32), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(real32), (void*)0);
     glEnableVertexAttribArray(0);
     // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(real32), (void*)(3* sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(real32), (void*)(3* sizeof(float)));
     glEnableVertexAttribArray(1);
+    // Texture attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(real32), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);  
 
     // Element Buffer Object
     uint32 EBO;
@@ -506,12 +545,6 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     glVertexAttribPointer(0, verticesCount, GL_FLOAT, GL_FALSE, verticesCount * sizeof(real32), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // compile shaders and get the shader program
-	// const char* vertexShader = readFile("E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultvertex.glsl");
-	// const char* fragmentShader = readFile("E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultfragment.glsl");
-    // uint32 shaderProgram = CompileShaders(vertexShader, fragmentShader);
-    // glUseProgram(shaderProgram);
-
     Devendra_Shader simple_shader;
     simple_shader = {};
     CompileFragmentShader(&simple_shader, "E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultfragment.glsl");
@@ -520,13 +553,12 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     useShader(&simple_shader);
 
     // Vsync
-    // 0 - off, 1 - on
-    wglSwapIntervalEXT(1);
+    // 0 - off, 1 - on, -1 - adaptive vsync
+    wglSwapIntervalEXT(-1);
 
     LARGE_INTEGER LastCounter;
 	QueryPerformanceCounter(&LastCounter);
 	uint64 LastCycleCount = __rdtsc();
-    real32 greenValue = 0.0f;
     while(!done)                                // Loop That Runs Until done=TRUE
     {   
         LARGE_INTEGER PerformanceCountFrequencyResult;
@@ -576,6 +608,7 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
         }
         useShader(&simple_shader);
         setUniform1f(&simple_shader, "time", counter);
+        glBindTexture(GL_TEXTURE_2D, texture);
         DrawGLScene(VAO, indiciesCount);              
         SwapBuffers(hDC);
         ////////////////////////////////////////////////////
@@ -587,8 +620,8 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
 		// TODO: Display the value here
 		uint64 CycleElapsed = EndCycleCount - LastCycleCount;
 		int64 CounterElapsed = EndCounter.QuadPart - LastCounter.QuadPart;
-		real32 MSPerFrame = (real32)((1000.0f * (real32)CounterElapsed) / (real32)PerformanceCountFrequency);
-		real32 FPS = (real32)PerformanceCountFrequency / (real32)CounterElapsed;
+		real32 MSPerFrame = ((1000.0f * (real32)CounterElapsed) / (real32)PerformanceCountFrequency);
+		real32 FPS = (real32)PerformanceCountFrequency / (real32) CounterElapsed;
 		real32 MegaCycles = (real32)(CycleElapsed / (1000.0f * 1000.0f));
         char* vsync = "OFF";
         if(wglGetSwapIntervalEXT())
@@ -604,8 +637,7 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
 		LastCounter = EndCounter;
 		LastCycleCount = EndCycleCount;
 
-        counter += 0.02f;
-        greenValue = (real32) (sin(counter) / 2.0f + 0.5f);
+        counter += 0.05f;
     }
     // Shutdown
     KillGLWindow();                                 

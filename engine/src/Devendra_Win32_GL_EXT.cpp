@@ -87,4 +87,5 @@ void InitGLFunctions(HDC hDC, HGLRC hRC)
     glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC) GetAnyGLFuncAddress("glGetUniformLocation");
     wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC) GetAnyGLFuncAddress("wglSwapIntervalEXT");
     wglGetSwapIntervalEXT = (PFNWGLGETSWAPINTERVALEXTPROC) GetAnyGLFuncAddress("wglGetSwapIntervalEXT");
+    glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC) GetAnyGLFuncAddress("glGenerateMipmap");
 }

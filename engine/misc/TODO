@@ -1,27 +1,31 @@
+Working:
+    [] Textures in opengl.
+
 TODO(Important):
-    [Pending] Implement a build system
-    [Pending] Improve the build.bat file
-    [Pending] Refactor the codebase.
-    [Pending] Implement Logging library.
-    [Pending] Mouse interface.
-    [Pending] Keyboard interface (Improve the existing one).
-    [Pending] Implement camera.
-    [Pending] Remove global window Handles and Opengl Contexts?
-    [Pending] Complete the Devendra_Shader.cpp file
+    [] Implement a build system
+    [] Improve the build.bat file
+    [] Refactor the codebase.
+    [] Implement Logging library.
+    [] Mouse interface.
+    [] Keyboard interface (Improve the existing one).
+    [] Implement camera.
+    [] Remove global window Handles and Opengl Contexts?
+    [] Complete the Devendra_Shader.cpp file
+    [] Setup compiler switches for performance counter and wireframing.
 
 TODO(Future Upgrade):
-    [Pending] Implement sound interface.
-    [Pending] Reorganize the glext.h and wglext.h
-    [Pending] Some weird memory issue, Free memory after resizing the screen
-    [Pending] Different translational unit for different files.
+    [] Create sound interface with fmod.
+    [] Reorganize the glext.h and wglext.h
+    [] Some weird memory issue, Free memory after resizing the screen
+    [] Different translational unit for different files.
     
 Completed:
-    [Done] Get a window up and running.
-    [Done] Use Modern opengl version in Win32 API
-    [Done] Implement a triangle with modern opengl and win32 API.
-    [Done] Seperate Fragment shader and Vertex shader to different files
-    [Done] Seperate OpenGL specific codes.
-    [Done] Fix Unload Class Error.
-    [Done] Fix inconsistent framerate and Window messages.
-    [Done] Vsync and color transition rectangle example.
-    [Done] Implement a colorful triangle with rainbow color.
+    [] Get a window up and running.
+    [] Use Modern opengl version in Win32 API
+    [] Implement a triangle with modern opengl and win32 API.
+    [] Seperate Fragment shader and Vertex shader to different files
+    [] Seperate OpenGL specific codes.
+    [] Fix Unload Class Error.
+    [] Fix inconsistent framerate and Window messages.
+    [] Vsync and color transition rectangle example.
+    [] Implement a colorful triangle with rainbow color.
