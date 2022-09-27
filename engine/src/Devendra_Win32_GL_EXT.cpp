@@ -49,8 +49,8 @@ void PrintSupportedOpenGLExtensions()
     { 
         const char* extension = 
             (const char*)glGetStringi(GL_EXTENSIONS, i);
-		// TODO: Optimize this wsprintf or replace it with something else
-		sprintf_s(Buffer, 250, "Ext %d: %s\n", i, extension);
-		OutputDebugStringA(Buffer);
+      // TODO: Optimize this wsprintf or replace it with something else
+      sprintf_s(Buffer, 250, "Ext %d: %s\n", i, extension);
+      OutputDebugStringA(Buffer);
     } 
 }

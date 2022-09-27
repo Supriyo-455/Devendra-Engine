@@ -9,7 +9,7 @@
 #include "../libs/wglext.h"                            // WGL extension interfaces.
 
 #ifdef __DEVENDRA_EXPORTS__
-#define DEVENDRA_GL_EXT   __declspec(dllexport)
+    #define DEVENDRA_GL_EXT   __declspec(dllexport)
 #else
    #define DEVENDRA_GL_EXT    __declspec(dllimport)
 #endif

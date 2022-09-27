@@ -1,35 +1,29 @@
-#include "include/defines.h"
 
 #include <windows.h>                              // Header File For Windows
-#include <gl/gl.h>                                // Header File For The OpenGL32 Library
-#include <gl/glu.h>                               // Header File For The GLu32 Library
-#include "libs/glext.h"                             // OpenGL 1.2 and above compatibility profile and extension interfaces
-#include "libs/wglext.h"                            // WGL extension interfaces.
 #include <stdio.h>
-#include "libs/Win32_keycodes.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "libs/stb_image.h"
-
 #include <stdarg.h>
 #include <stdbool.h>
 #include <time.h>
 #include <math.h>
 
+#include "include/defines.h"
+#include "include/Devendra_Win32_GL_EXT.h"
+#include "libs/Win32_keycodes.h"
+
 #include "include/Devendra_Utils.h"
 #include "src/Devendra_Utils.cpp"
-
-#include "include/Devendra_Win32_GL_EXT.h"
 
 #include "include/Win32_GL.h"
 #include "src/Win32_GL.cpp"
 
-// #include "include/Devendra_Logger.h"
-// #include "src/Devendra_Logger.cpp"
-
 #include "include/Devendra_Shader.h"
 #include "src/Devendra_Shader.cpp"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "libs/stb_image.h"
+
+// #include "include/Devendra_Logger.h"
+// #include "src/Devendra_Logger.cpp"
 
 HGLRC           hRC=NULL;                           // Permanent Rendering Context
 HDC             hDC=NULL;                           // Private GDI Device Context
