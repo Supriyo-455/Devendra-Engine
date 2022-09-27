@@ -1,11 +1,11 @@
 Working:
-    [] Textures in opengl.
-
-TODO(Important):
     [] Implement a build system
     [] Improve the build.bat file
     [] Refactor the codebase.
-    [] Implement Logging library.
+    [] Ship opengl code to a library.
+
+TODO(Important):
+    [] Create Logging library.
     [] Mouse interface.
     [] Keyboard interface (Improve the existing one).
     [] Implement camera.
@@ -29,3 +29,4 @@ Completed:
     [] Fix inconsistent framerate and Window messages.
     [] Vsync and color transition rectangle example.
     [] Implement a colorful triangle with rainbow color.
+    [] Textures in opengl.

@@ -1,22 +1,4 @@
-#include <stdint.h>
-#define PI 3.1415926535897932384626433832795028841971f
-
-typedef uint8_t uint8;
-typedef uint16_t uint16;
-typedef uint32_t uint32;
-typedef uint64_t uint64;
-
-typedef int8_t int8;
-typedef int16_t int16;
-typedef int32_t int32;
-typedef int64_t int64;
-typedef int32 bool32;
-
-typedef float real32;
-typedef double real64;
-
-#define internal static;
-#define global static;
+#include "include/defines.h"
 
 #include <windows.h>                              // Header File For Windows
 #include <gl/gl.h>                                // Header File For The OpenGL32 Library
@@ -38,7 +20,6 @@ typedef double real64;
 #include "src/Devendra_Utils.cpp"
 
 #include "include/Devendra_Win32_GL_EXT.h"
-#include "src/Devendra_Win32_GL_EXT.cpp"
 
 #include "include/Win32_GL.h"
 #include "src/Win32_GL.cpp"
