@@ -1,7 +1,3 @@
-#include <windows.h>                              // Header File For Windows
-#include <stdio.h>
-#include <stdarg.h>
-#include <stdbool.h>
 #include <time.h>
 #include <math.h>
 
@@ -87,7 +83,6 @@ LRESULT CALLBACK WndProc(
     return DefWindowProc(wHandle,uMsg,wParam,lParam);
 }
 
-float counter;
 int WINAPI WinMain(HINSTANCE   Instance,              // Instance
                     HINSTANCE   hPrevInstance,              // Previous Instance
                     LPSTR       lpCmdLine,              // Command Line Parameters
@@ -106,6 +101,8 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
 
     MSG msg;                                // Windows Message Structure
     bool32 done=FALSE;                         // Bool Variable To Exit Loop
+    bool32 verticalSyncFlag = 0;
+    float counter = 0.0f;
 
     DWindow.title = "Devendra Engine";
     DWindow.width = 640;
@@ -153,15 +150,19 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
         2, 3, 1
     };
    
-    uint32 texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    
+    // Texture 1
+    uint32 texture1;
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1); 
+     // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    int32 width, height, nrChannels;
+    // load image, create texture and generate mipmaps
+    int width, height, nrChannels;
     uint8 *data = stbi_load("E:\\personal project\\Devendra-Engine\\engine\\misc\\textures\\wall.jpg", &width, &height, &nrChannels, 0);
     if(data)
     {
@@ -171,6 +172,37 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     else
     {
         MessageBox
+            (
+                NULL,
+                "Failed to load the texture format!", 
+                "Error occured!",
+                MB_OK|MB_ICONERROR
+            );
+    }
+    stbi_image_free(data);
+
+    // Texture 2
+    uint32 texture2;
+
+    glGenTextures(1, &texture2);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load image, create texture and generate mipmaps
+    data = stbi_load("E:\\personal project\\Devendra-Engine\\engine\\misc\\textures\\awesomeface.png", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        // note that the awesomeface.png has transparency and thus an alpha channel, so make sure to tell OpenGL the data type is of GL_RGBA
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+       MessageBox
             (
                 NULL,
                 "Failed to load the texture format!", 
@@ -223,9 +255,9 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     CompileShaderProgram(&simple_shader);
     useShader(&simple_shader);
 
-    // Vsync
-    // 0 - off, 1 - on, -1 - adaptive vsync
-    wglSwapIntervalEXT(-1);
+    // Set the Texture variables locations for fragment shader
+    glUniform1i(glGetUniformLocation(simple_shader.ShaderProgramID, "texture1"), 0);
+    glUniform1i(glGetUniformLocation(simple_shader.ShaderProgramID, "texture2"), 1);
 
     LARGE_INTEGER LastCounter;
 	QueryPerformanceCounter(&LastCounter);
@@ -245,10 +277,17 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
             TranslateMessage(&msg);             // Translate The Message
             DispatchMessage(&msg);
         }
+        
+        //////////////////////////////// Key events ////////////////////////////////////////
         // Draw The Scene.  Watch For ESC Key And Quit Messages From DrawGLScene()
         if (keys[VK_ESCAPE])                
         {
             done=TRUE;              
+        }
+
+        if (keys[VK_KEY_V])
+        {
+            verticalSyncFlag = !verticalSyncFlag;
         }
 
         if(keys[VK_KEY_W])
@@ -267,6 +306,7 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
                 return 0;              
             }
         }
+        ////////////////////////////////////////////////////////////////////////////////////////
 
         //////////// Drawing to the Screen /////////////////
         if(DWindow.wireframe)
@@ -279,7 +319,11 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
         }
         useShader(&simple_shader);
         setUniform1f(&simple_shader, "time", counter);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
+        useShader(&simple_shader);
         DrawGLScene(VAO, indiciesCount);              
         SwapBuffers(DWindow.hDC);
         ////////////////////////////////////////////////////
@@ -294,6 +338,11 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
 		real32 MSPerFrame = ((1000.0f * (real32)CounterElapsed) / (real32)PerformanceCountFrequency);
 		real32 FPS = (real32)PerformanceCountFrequency / (real32) CounterElapsed;
 		real32 MegaCycles = (real32)(CycleElapsed / (1000.0f * 1000.0f));
+        
+        // Vsync
+        // 0 - off, 1 - on, -1 - adaptive vsync
+        wglSwapIntervalEXT(verticalSyncFlag);
+
         char* vsync = "OFF";
         if(wglGetSwapIntervalEXT())
         {

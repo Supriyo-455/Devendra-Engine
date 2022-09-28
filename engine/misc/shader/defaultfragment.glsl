@@ -7,10 +7,11 @@ in vec2 TexCoord;
 
 
 uniform float time;
-uniform sampler2D ourTexture;
+uniform sampler2D texture1;
+uniform sampler2D texture2;
 
 void main(void) {
     float wave = sin(time);
     // Put it all together
-    FragColor = texture(ourTexture, TexCoord) * vertexColor * wave;
+    FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.5) * vertexColor * wave;
 }

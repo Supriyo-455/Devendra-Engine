@@ -35,6 +35,10 @@ PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
 PFNGLGETSTRINGIPROC glGetStringi;
 PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
 PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
+PFNGLUNIFORM1IPROC glUniform1i;
+PFNGLUNIFORM2IPROC glUniform2i;
+PFNGLUNIFORM3IPROC glUniform3i;
+PFNGLUNIFORM4IPROC glUniform4i;
 PFNGLUNIFORM1FPROC glUniform1f;
 PFNGLUNIFORM2FPROC glUniform2f;
 PFNGLUNIFORM3FPROC glUniform3f;
@@ -43,6 +47,7 @@ PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 PFNWGLGETSWAPINTERVALEXTPROC wglGetSwapIntervalEXT;
 PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
+PFNGLACTIVETEXTUREPROC glActiveTexture;
 
 DEVENDRA_GL_EXT void *GetAnyGLFuncAddress(const char *name);
 DEVENDRA_GL_EXT bool32 IsExtensionSupported(const char *extension_name);
@@ -74,6 +79,10 @@ void InitGLFunctions(HDC hDC, HGLRC hRC)
     glGetStringi = (PFNGLGETSTRINGIPROC) GetAnyGLFuncAddress("glGetStringi");
     glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC) GetAnyGLFuncAddress("glGenVertexArrays");
     glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC) GetAnyGLFuncAddress("glBindVertexArray");
+    glUniform1i = (PFNGLUNIFORM1IPROC) GetAnyGLFuncAddress("glUniform1i");
+    glUniform2i = (PFNGLUNIFORM2IPROC) GetAnyGLFuncAddress("glUniform2i");
+    glUniform3i = (PFNGLUNIFORM3IPROC) GetAnyGLFuncAddress("glUniform3i");
+    glUniform4i = (PFNGLUNIFORM4IPROC) GetAnyGLFuncAddress("glUniform4i");
     glUniform1f = (PFNGLUNIFORM1FPROC) GetAnyGLFuncAddress("glUniform1f");
     glUniform2f = (PFNGLUNIFORM2FPROC) GetAnyGLFuncAddress("glUniform2f");
     glUniform3f = (PFNGLUNIFORM3FPROC) GetAnyGLFuncAddress("glUniform3f");
@@ -82,6 +91,7 @@ void InitGLFunctions(HDC hDC, HGLRC hRC)
     wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC) GetAnyGLFuncAddress("wglSwapIntervalEXT");
     wglGetSwapIntervalEXT = (PFNWGLGETSWAPINTERVALEXTPROC) GetAnyGLFuncAddress("wglGetSwapIntervalEXT");
     glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC) GetAnyGLFuncAddress("glGenerateMipmap");
+    glActiveTexture = (PFNGLACTIVETEXTUREPROC) GetAnyGLFuncAddress("glActiveTexture");
 }
 
 #endif
