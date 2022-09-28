@@ -8,7 +8,7 @@
 #include "../libs/glext.h"                             // OpenGL 1.2 and above compatibility profile and extension interfaces
 #include "../libs/wglext.h"                            // WGL extension interfaces.
 
-#ifdef __DEVENDRA_EXPORTS__
+#ifdef __DEVENDRA_GL_EXT_EXPORTS__
     #define DEVENDRA_GL_EXT   __declspec(dllexport)
 #else
    #define DEVENDRA_GL_EXT    __declspec(dllimport)
@@ -47,6 +47,7 @@ PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
 DEVENDRA_GL_EXT void *GetAnyGLFuncAddress(const char *name);
 DEVENDRA_GL_EXT bool32 IsExtensionSupported(const char *extension_name);
 DEVENDRA_GL_EXT void PrintSupportedOpenGLExtensions();
+
 void InitGLFunctions(HDC hDC, HGLRC hRC) 
 {
     wglCreateContext(hDC);

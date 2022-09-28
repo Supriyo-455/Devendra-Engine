@@ -1,4 +1,8 @@
-#include "include/Devendra_Utils.h"
+#include "../include/Devendra_Utils.h"
+
+#include <stdio.h>
+#include <malloc.h>
+#include "../include/defines.h"
 
 const char* readFile(const char *filePath)
 {
