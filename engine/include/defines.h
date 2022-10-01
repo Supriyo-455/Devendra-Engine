@@ -1,5 +1,4 @@
 #include <stdint.h>
-#define PI 3.1415926535897932384626433832795028841971f
 
 typedef uint8_t uint8;
 typedef uint16_t uint16;

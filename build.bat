@@ -3,7 +3,7 @@
 echo Building exeutables for Devendra....
 REM To find the executables go to Devendra-Engine > Build
 
-set CommonCompilerFlags=-nologo -Oi -W4 -FC -wd4706 -wd4701 -wd4273 -wd4100 -Zi -WX
+set CommonCompilerFlags=-nologo -Oi -W4 -FC -Zi -WX -wd4706 -wd4701 -wd4273 -wd4201 -wd4100 -wd4305
 set CommonLinkerFlags=OpenGL32.lib GLu32.lib Gdi32.lib User32.lib
 
 IF not exist build mkdir build

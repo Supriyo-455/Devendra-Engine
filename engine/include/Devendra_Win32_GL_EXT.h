@@ -48,6 +48,8 @@ PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 PFNWGLGETSWAPINTERVALEXTPROC wglGetSwapIntervalEXT;
 PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
 PFNGLACTIVETEXTUREPROC glActiveTexture;
+PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
+PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 
 DEVENDRA_GL_EXT void *GetAnyGLFuncAddress(const char *name);
 DEVENDRA_GL_EXT bool32 IsExtensionSupported(const char *extension_name);
@@ -92,6 +94,8 @@ void InitGLFunctions(HDC hDC, HGLRC hRC)
     wglGetSwapIntervalEXT = (PFNWGLGETSWAPINTERVALEXTPROC) GetAnyGLFuncAddress("wglGetSwapIntervalEXT");
     glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC) GetAnyGLFuncAddress("glGenerateMipmap");
     glActiveTexture = (PFNGLACTIVETEXTUREPROC) GetAnyGLFuncAddress("glActiveTexture");
+    glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC) GetAnyGLFuncAddress("glDeleteVertexArrays");
+    glDeleteBuffers = (PFNGLDELETEBUFFERSPROC) GetAnyGLFuncAddress("glDeleteBuffers");
 }
 
 #endif

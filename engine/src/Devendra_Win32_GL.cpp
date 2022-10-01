@@ -39,7 +39,7 @@ bool32 CreateGLWindow(Devendra_Window* DWindow, WNDPROC WndProc)
 
     if (DWindow->fullscreen)                             // Attempt Fullscreen Mode?
     {
-        DEVMODE dmScreenSettings;                   // Device Mode
+        DEVMODE dmScreenSettings;                                   // Device Mode
         memset(&dmScreenSettings,0,sizeof(dmScreenSettings));       // Makes Sure Memory's Cleared
         dmScreenSettings.dmSize=sizeof(dmScreenSettings);       // Size Of The Devmode Structure
         dmScreenSettings.dmPelsWidth    = DWindow->width;            // Selected Screen Width
@@ -91,13 +91,14 @@ bool32 CreateGLWindow(Devendra_Window* DWindow, WNDPROC WndProc)
     
     AdjustWindowRectEx(&WindowRect, dwStyle, FALSE, dwExStyle);     // Adjust Window To True Requested Size
 
-    if (!(DWindow->hWnd=CreateWindowEx(  dwExStyle,              // Extended Style For The Window
+    if (!(DWindow->hWnd=CreateWindowEx(  
+                dwExStyle,                       // Extended Style For The Window
                 "Devendra Engine",               // Class Name
                 DWindow->title,                  // Window Title
-                WS_CLIPSIBLINGS |           // Required Window Style
-                WS_CLIPCHILDREN |           // Required Window Style
-                dwStyle,                // Selected Window Style
-                0, 0,                   // Window Position
+                WS_CLIPSIBLINGS |               // Required Window Style
+                WS_CLIPCHILDREN |               // Required Window Style
+                dwStyle,                        // Selected Window Style
+                0, 0,                           // Window Position
                 WindowRect.right-WindowRect.left,   // Calculate Adjusted Window Width
                 WindowRect.bottom-WindowRect.top,   // Calculate Adjusted Window Height
                 NULL,                   // No Parent Window
@@ -434,10 +435,13 @@ void CompileShaderProgram(Devendra_Shader* shader)
 void useShader(Devendra_Shader* shader)
 {
     glUseProgram(shader->ShaderProgramID);
-    shader->active = false;
+    shader->active = true;
 }
 
-void setUniform1i(Devendra_Shader* shader);
+void setUniform1i(Devendra_Shader* shader, const char* name, int32 value)
+{
+    glUniform1i(glGetUniformLocation(shader->ShaderProgramID, name), value);
+}
 void setUniform2i(Devendra_Shader* shader);
 void setUniform3i(Devendra_Shader* shader);
 void setUniform4i(Devendra_Shader* shader);

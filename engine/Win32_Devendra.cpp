@@ -1,5 +1,4 @@
 #include <time.h>
-#include <math.h>
 
 #include "include/defines.h"
 #include "include/Devendra_Win32_GL_EXT.h"
@@ -10,11 +9,18 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "libs/stb_image.h"
 
+#include "include/Devendra_Math.h"
+
 Devendra_Window DWindow = {};
 
 bool32    keys[256];                                  // Array Used For The Keyboard Routine
+typedef struct mouse{
+	int16 x, y;
+	uint8 buttons;
+} mouse;
+enum { MOUSE_LEFT = 0b1, MOUSE_MIDDLE = 0b10, MOUSE_RIGHT = 0b100, MOUSE_X1 = 0b1000, MOUSE_X2 = 0b10000 };
 
-// TODO(supriyo): Create seperate API for user input handle
+// TODO: Create seperate API for user input handle
 LRESULT CALLBACK WndProc(   
                 HWND    wHandle,                   // Handle For This Window
                 uint32    uMsg,                   // Message For This Window
@@ -54,7 +60,7 @@ LRESULT CALLBACK WndProc(
         }
         case WM_LBUTTONDOWN:
         {
-            DWindow.wireframe = !DWindow.wireframe;
+            DWindow.wireframe = ~DWindow.wireframe;
             return 0;
         }
         case WM_CLOSE:                          // Did We Receive A Close Message?
@@ -65,7 +71,7 @@ LRESULT CALLBACK WndProc(
         case WM_KEYDOWN:                        // Is A Key Being Held Down?
         {
             keys[wParam] = TRUE;                    // If So, Mark It As TRUE
-            return 0;                       // Jump Back
+            return 0;                               // Jump Back
         }
         case WM_KEYUP:                          // Has A Key Been Released?
         {
@@ -88,7 +94,7 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
                     LPSTR       lpCmdLine,              // Command Line Parameters
                     int         nCmdShow)               // Window Show State
 {
-    /// @brief  TODO(supriyo): Use this in future?
+    /// @brief  TODO: Use this in future?
     /// @param Instance 
     /// @param hPrevInstance 
     /// @param lpCmdLine 
@@ -101,7 +107,6 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
 
     MSG msg;                                // Windows Message Structure
     bool32 done=FALSE;                         // Bool Variable To Exit Loop
-    bool32 verticalSyncFlag = 0;
     float counter = 0.0f;
 
     DWindow.title = "Devendra Engine";
@@ -136,20 +141,21 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     // Supported OpenGL extension
     PrintSupportedOpenGLExtensions();
 
-    // TODO(supriyo): Pull out the vertex buffer object related code from here!!
+    // TODO: Pull out the vertex buffer object related code from here!!
     //  Vertex data
     real32 vertices[] = {
-        // positions         // colors              // Tex coords
-         0.5f,  -0.5f,  0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f,  // lower-right corner
-        -0.5f,  -0.5f,  0.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,  // lower-left corner  
-         0.5f,   0.5f,  0.0f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f,   // top-left corner
-        -0.5f,   0.5f,  0.0f,   0.0f, 1.0f, 1.0f,   0.0f, 1.0f    // top-right corner
-    }; 
-    uint32 indices[] = {  // note that we start from 0!
-        0, 1, 2,
-        2, 3, 1
+        // positions          // colors           // texture coords
+         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   2.0f, 2.0f, // top right
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 2.0f  // top left 
     };
-   
+    uint32 indices[] = {  // note that we start from 0!
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
+    };
+    
+    stbi_set_flip_vertically_on_load(true);
     
     // Texture 1
     uint32 texture1;
@@ -256,8 +262,12 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     useShader(&simple_shader);
 
     // Set the Texture variables locations for fragment shader
-    glUniform1i(glGetUniformLocation(simple_shader.ShaderProgramID, "texture1"), 0);
-    glUniform1i(glGetUniformLocation(simple_shader.ShaderProgramID, "texture2"), 1);
+    setUniform1i(&simple_shader, "texture1", 0);
+    setUniform1i(&simple_shader, "texture2", 1);
+
+    // Vsync
+    // 0 - off, 1 - on, -1 - adaptive vsync
+    wglSwapIntervalEXT(-1);
 
     LARGE_INTEGER LastCounter;
 	QueryPerformanceCounter(&LastCounter);
@@ -285,21 +295,16 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
             done=TRUE;              
         }
 
-        if (keys[VK_KEY_V])
-        {
-            verticalSyncFlag = !verticalSyncFlag;
-        }
-
         if(keys[VK_KEY_W])
         {
-            DWindow.wireframe = !DWindow.wireframe;
+            DWindow.wireframe = ~DWindow.wireframe;
         }
 
         if (keys[VK_F1])                    
         {
             keys[VK_F1]=FALSE;              
             KillGLWindow(&DWindow);                 
-            DWindow.fullscreen=!DWindow.fullscreen;             
+            DWindow.fullscreen = ~DWindow.fullscreen;
             // Recreate Our OpenGL Window
             if (!CreateGLWindow(&DWindow, (WNDPROC) WndProc))
             {
@@ -318,7 +323,7 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
         useShader(&simple_shader);
-        setUniform1f(&simple_shader, "time", counter);
+        setUniform1f(&simple_shader, "time", absf(sin(counter)));
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
@@ -338,10 +343,6 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
 		real32 MSPerFrame = ((1000.0f * (real32)CounterElapsed) / (real32)PerformanceCountFrequency);
 		real32 FPS = (real32)PerformanceCountFrequency / (real32) CounterElapsed;
 		real32 MegaCycles = (real32)(CycleElapsed / (1000.0f * 1000.0f));
-        
-        // Vsync
-        // 0 - off, 1 - on, -1 - adaptive vsync
-        wglSwapIntervalEXT(verticalSyncFlag);
 
         char* vsync = "OFF";
         if(wglGetSwapIntervalEXT())
@@ -357,9 +358,12 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
 		LastCounter = EndCounter;
 		LastCycleCount = EndCycleCount;
 
-        counter += 0.05f;
+        counter += 0.8f;
     }
     // Shutdown
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
     KillGLWindow(&DWindow);                                 
     return (int32)(msg.wParam);                            
 }

@@ -18,13 +18,13 @@
 
 typedef struct Devendra_Window
 {
-    HGLRC           hRC=NULL;                                   // Permanent Rendering Context
-    HDC             hDC=NULL;                                   // Private GDI Device Context
-    HWND            hWnd=NULL;                                  // Holds Our Window Handle
+    HGLRC           hRC;                                   // Permanent Rendering Context
+    HDC             hDC;                                   // Private GDI Device Context
+    HWND            hWnd;                                  // Holds Our Window Handle
     HINSTANCE       hInstance;                                  // Holds The Instance Of The Application
-    bool32          active=TRUE;                                // Window Active Flag Set To TRUE By Default
-    bool32          fullscreen=TRUE;                            // Fullscreen Flag Set To Fullscreen Mode By Default
-    bool32          wireframe = false;                          // For wireframing
+    bool32          active;                                // Window Active Flag Set To TRUE By Default
+    bool32          fullscreen;                            // Fullscreen Flag Set To Fullscreen Mode By Default
+    bool32          wireframe;                          // For wireframing
     char*           title; 
     int16           width; 
     int16           height; 
@@ -50,7 +50,7 @@ DEVENDRA_WIN32_GL_API void CompileVertexShader(Devendra_Shader* shader, const ch
 DEVENDRA_WIN32_GL_API void CompileShaderProgram(Devendra_Shader* shader);
 DEVENDRA_WIN32_GL_API void useShader(Devendra_Shader* shader);
 
-DEVENDRA_WIN32_GL_API void setUniform1i(Devendra_Shader* shader);
+DEVENDRA_WIN32_GL_API void setUniform1i(Devendra_Shader* shader, const char* name, int32 value);
 DEVENDRA_WIN32_GL_API void setUniform2i(Devendra_Shader* shader);
 DEVENDRA_WIN32_GL_API void setUniform3i(Devendra_Shader* shader);
 DEVENDRA_WIN32_GL_API void setUniform4i(Devendra_Shader* shader);
