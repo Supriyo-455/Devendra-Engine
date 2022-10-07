@@ -80,7 +80,32 @@ typedef union vec4
     };
 }vec4;
 
-// TODO(supriyo): Write generating functions for vec2, vec3 and vec4
+inline vec2 vec(real32 x, real32 y)
+{
+    vec2 V = {};
+    V.x = x;
+    V.y = y;
+    return V;
+}
+
+inline vec3 vec(real32 x, real32 y, real32 z)
+{
+    vec3 V = {};
+    V.x = x;
+    V.y = y;
+    V.z = z;
+    return V;
+}
+
+inline vec4 vec(real32 x, real32 y, real32 z, real32 w)
+{
+    vec4 V = {};
+    V.x = x;
+    V.y = y;
+    V.z = z;
+    V.w = w;
+    return V;
+}
 
 inline real32 magnitude(vec2 A)
 {
@@ -189,15 +214,13 @@ inline mat4x4 scalingMat4x4(vec3 S)
     return I;
 }
 
-inline mat4x4 transMat4x4(vec3 T)
+inline mat4x4 transMat4x4(mat4x4 A, vec3 T)
 {
-    mat4x4 I = identity();
-
     for(int i=0; i<3; i++)
     {
-        I.E[i][3] = T.E[i];
+        A.E[i][3] = T.E[i];
     }
-    return I;
+    return A;
 }
 
 inline mat4x4 operator*(mat4x4 A, real32 B)
@@ -237,6 +260,19 @@ inline vec4 operator*(mat4x4 A, vec4 B)
         for(int c=0; c<4; c++)
         {
             R.E[r] += A.E[r][c] * B.E[c]; 
+        }
+    }
+    return R;
+}
+
+inline mat4x4 operator+(mat4x4 A, mat4x4 B)
+{   
+    mat4x4 R = {};
+    for(int r=0; r<4; r++)
+    {
+        for(int c=0; c<4; c++)
+        {
+            R.E[r][c] += A.E[r][c] + B.E[r][c]; 
         }
     }
     return R;

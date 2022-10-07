@@ -145,10 +145,10 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     //  Vertex data
     real32 vertices[] = {
         // positions          // colors           // texture coords
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   2.0f, 2.0f, // top right
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f, // bottom right
+         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
         -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 2.0f  // top left 
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
     };
     uint32 indices[] = {  // note that we start from 0!
         0, 1, 3, // first triangle
@@ -265,13 +265,8 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     setUniform1i(&simple_shader, "texture1", 0);
     setUniform1i(&simple_shader, "texture2", 1);
 
-    mat4x4 trans = identity();
-    trans = rotateZ(90.0f);
-    trans = trans * 0.5f;
-    trans = transpose(trans);
-
+    mat4x4 trans = {};
     uint32 transformLoc = glGetUniformLocation(simple_shader.ShaderProgramID, "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &trans.E[0][0]);  // NOTE: How to convert mat4x4 to GLFLoat *
 
     // Vsync
     // 0 - off, 1 - on, -1 - adaptive vsync
@@ -330,12 +325,15 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
         {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
-        useShader(&simple_shader);
         setUniform1f(&simple_shader, "time", absf(sin(counter)));
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
+        trans = rotateZ(-counter*sin(counter));  // Note: For Variable Rotation
+        trans = transMat4x4(trans, vec(sin(counter) * 0.5f, 0.0f, 0.0f));   // Note: For translate along X axis back and forth
+        trans = transpose(trans);
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &trans.E[0][0]); // NOTE: How to convert mat4x4 to GLFLoat *
         useShader(&simple_shader);
         DrawGLScene(VAO, indiciesCount);              
         SwapBuffers(DWindow.hDC);
