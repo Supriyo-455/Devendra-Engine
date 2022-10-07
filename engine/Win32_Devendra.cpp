@@ -265,6 +265,14 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     setUniform1i(&simple_shader, "texture1", 0);
     setUniform1i(&simple_shader, "texture2", 1);
 
+    mat4x4 trans = identity();
+    trans = rotateZ(90.0f);
+    trans = trans * 0.5f;
+    trans = transpose(trans);
+
+    uint32 transformLoc = glGetUniformLocation(simple_shader.ShaderProgramID, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &trans.E[0][0]);  // NOTE: How to convert mat4x4 to GLFLoat *
+
     // Vsync
     // 0 - off, 1 - on, -1 - adaptive vsync
     wglSwapIntervalEXT(-1);
