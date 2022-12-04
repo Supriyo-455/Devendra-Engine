@@ -1,5 +1,4 @@
-#ifndef __DEVENDRA_MATH_H__
-#define __DEVENDRA_MATH_H__
+#pragma once
 
 #include "defines.h"
 #include <math.h>
@@ -340,5 +339,3 @@ inline mat4x4 projection(real32 AspectWithOverHeight, real32 FocalLength)
 
     return R;
 }
-
-#endif

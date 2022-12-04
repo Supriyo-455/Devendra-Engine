@@ -1,5 +1,4 @@
-#ifndef __DEVENDRA_WIN32_GL__
-#define __DEVENDRA_WIN32_GL__
+#pragma once
 
 #include <windows.h>                              // Header File For Windows
 #include <stdio.h>
@@ -61,5 +60,3 @@ DEVENDRA_WIN32_GL_API void setUniform3f(Devendra_Shader* shader);
 DEVENDRA_WIN32_GL_API void setUniform4f(Devendra_Shader* shader);
 
 DEVENDRA_WIN32_GL_API Devendra_Shader* createShaderFromHeap(Devendra_Shader* shader);
-
-#endif

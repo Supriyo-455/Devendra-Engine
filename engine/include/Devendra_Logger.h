@@ -1,5 +1,4 @@
-#ifndef LOG_H
-#define LOG_H
+#pragma once
 
 #define LOG_VERSION "0.1.0"
 
@@ -34,5 +33,3 @@ int32 log_add_callback(log_LogFn fn, void *udata, int32 level);
 int32 log_add_fp(FILE *fp, int32 level);
 
 void log_log(int32 level, const char *file, int32 line, const char *fmt, ...);
-
-#endif

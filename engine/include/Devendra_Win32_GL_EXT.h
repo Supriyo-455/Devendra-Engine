@@ -1,5 +1,4 @@
-#ifndef __DEVENDRA_WIN32_GL_EXT_H__
-#define __DEVENDRA_WIN32_GL_EXT_H__
+#pragma once
 
 #include "defines.h"
 #include <windows.h>                              // Header File For Windows
@@ -103,5 +102,3 @@ void InitGLFunctions(HDC hDC, HGLRC hRC)
     glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC) GetAnyGLFuncAddress("glDeleteVertexArrays");
     glDeleteBuffers = (PFNGLDELETEBUFFERSPROC) GetAnyGLFuncAddress("glDeleteBuffers");
 }
-
-#endif

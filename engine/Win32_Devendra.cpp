@@ -330,7 +330,7 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
-        trans = rotateZ(-counter*sin(counter));  // Note: For Variable Rotation
+        trans = rotateZ(-4*360.0f*sin(counter));  // Note: For Variable Rotation
         trans = transMat4x4(trans, vec(sin(counter) * 0.5f, 0.0f, 0.0f));   // Note: For translate along X axis back and forth
         trans = transpose(trans);
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &trans.E[0][0]); // NOTE: How to convert mat4x4 to GLFLoat *

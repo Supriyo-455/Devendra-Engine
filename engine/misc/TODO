@@ -1,5 +1,4 @@
 Working:
-    [] Make a math library.
     [] Integreate ImGUI
     [] Mouse interface.
     [] Keyboard interface (Improve the existing one).
@@ -12,6 +11,7 @@ TODO(Important):
     [] Setup compiler switches for performance counter and wireframing.
 
 TODO(Future Upgrade):
+    [] Write test cases for math library
     [] Create sound interface with DirectSound.
     [] Reorganize the glext.h and wglext.h
     [] Some weird memory issue, Free memory after resizing the screen
@@ -33,3 +33,4 @@ Completed:
     [] Textures in opengl.
     [] Ship opengl code to a library.
     [] Different translational unit for different files.
+    [] Make a math library.

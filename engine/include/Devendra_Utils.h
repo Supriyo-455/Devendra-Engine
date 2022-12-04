@@ -1,5 +1,4 @@
-#ifndef _DEVENDRA_UTIL_H
-#define _DEVENDRA_UTIL_H
+#pragma once
 
 #ifdef __DEVENDRA_UTILS_EXPORTS__
 #define DEVENDRA_UTILS_API __declspec(dllexport)
@@ -8,5 +7,3 @@
 #endif
 
 DEVENDRA_UTILS_API const char* readFile(const char *filePath);
-
-#endif
