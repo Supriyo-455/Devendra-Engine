@@ -1,0 +1,24 @@
+########################################################################
+
+                Devendra Engine Issue tracker
+
+########################################################################
+
+Levels:
+    1) Low - Issues that are low not effect engine build and running
+    2) Medium - Issues that can effect performance of the engine
+    3) Critical - Issues that causes runtime errors
+    4) Broken - Issues that brokes the engine
+
+Broken:
+    []
+
+Critical:
+    []  Renderer abstraction not working for textures
+
+Medium:
+    []  Devendra_Clock not giving the correct result
+    []  No centralized build system for making obj and dlls
+
+Low:
+    []  

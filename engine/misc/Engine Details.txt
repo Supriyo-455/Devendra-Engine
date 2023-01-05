@@ -1,0 +1,18 @@
+#########################################################################
+
+                            Devendra Engine
+
+##########################################################################
+
+
+About the project:
+    This project aims at using 100% of the C language to build
+high performant games. The engine is totally built by keep in mind 
+the high speed compilation and running time of C language with its 
+excillent low level compatibility with the hardware. 
+
+    Devendra Engine is totally build by me, no additional libraries are 
+used inside the engine. Everything from window management from integrating 
+graphics api, sound, logging, mathematics and physics are build by me. Main 
+goal is to keep the building cost low and make a engine that will perform 
+exceptionally well.

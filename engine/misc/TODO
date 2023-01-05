@@ -1,17 +1,20 @@
 Working:
-    [] Integreate ImGUI
-    [] Mouse interface.
-    [] Keyboard interface (Improve the existing one).
-    [] Create a renderer.
-
+    [] Create Platform independent renderer
+    [] Create System clock for engine
+    
 TODO(Important):
     [] Create Logging library.
     [] Implement camera.
     [] Remove global window Handles and Opengl Contexts?
     [] Setup compiler switches for performance counter and wireframing.
+    [] Create Build system using python and sCons
+    [] Integreate ImGUI
+    [] Mouse interface.
+    [] Keyboard interface (Improve the existing one).
+    [] Add Criterion unit testing for code
+    [] Migrate math operations to SIMD operations
 
 TODO(Future Upgrade):
-    [] Write test cases for math library
     [] Create sound interface with DirectSound.
     [] Reorganize the glext.h and wglext.h
     [] Some weird memory issue, Free memory after resizing the screen
@@ -20,6 +23,12 @@ TODO(Future Upgrade):
     [] Refactor the codebase.
     [] Implement asin() and acos() function without math.h
     
+Backlog:
+    [] Move from C style to Object Oriented C++ style?
+    [] Linux system porting
+    [] Create debug interface
+    [] Integrate CMAKE for build system
+
 Completed:
     [] Get a window up and running.
     [] Use Modern opengl version in Win32 API

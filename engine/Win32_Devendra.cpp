@@ -9,7 +9,13 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "libs/stb_image.h"
 
+#include "include/Devendra_Clock.h"
+#include "src/Devendra_Clock.cpp"
+
 #include "include/Devendra_Math.h"
+
+#include "include/Devendra_Renderer.h"
+#include "src/Devendra_Renderer.cpp"
 
 Devendra_Window DWindow = {};
 
@@ -135,9 +141,7 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
         return 0;                           // Quit If Window Was Not Created
     }
 
-    // Init the opengl functions
-    InitGLFunctions(DWindow.hDC, DWindow.hRC);
-
+    
     // Supported OpenGL extension
     PrintSupportedOpenGLExtensions();
 
@@ -154,28 +158,19 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
         0, 1, 3, // first triangle
         1, 2, 3  // second triangle
     };
+
+    Devendra_Renderer renderer = {};
     
-    stbi_set_flip_vertically_on_load(true);
+    Devendra_Shader simple_shader = {};
+    simple_shader.vertexShaderPath = "E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultfragment.glsl";
+    simple_shader.fragmentShaderPath = "E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultvertex.glsl";
+
+    RendererInit(&renderer, &DWindow);
+    RendererBindBuffers(&renderer, vertices, sizeof(vertices) / sizeof(vertices[0]), indices,  sizeof(indices) / sizeof(indices[0]),  8 * sizeof(real32));
     
     // Texture 1
-    uint32 texture1;
-    glGenTextures(1, &texture1);
-    glBindTexture(GL_TEXTURE_2D, texture1); 
-     // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load image, create texture and generate mipmaps
-    int width, height, nrChannels;
-    uint8 *data = stbi_load("E:\\personal project\\Devendra-Engine\\engine\\misc\\textures\\wall.jpg", &width, &height, &nrChannels, 0);
-    if(data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
+    Devendra_Texture texture1 = CreateTexture("E:\\personal project\\Devendra-Engine\\engine\\misc\\textures\\awesomeface.png");
+    if(LoadTexture(&texture1))
     {
         MessageBox
             (
@@ -185,28 +180,10 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
                 MB_OK|MB_ICONERROR
             );
     }
-    stbi_image_free(data);
 
     // Texture 2
-    uint32 texture2;
-
-    glGenTextures(1, &texture2);
-    glBindTexture(GL_TEXTURE_2D, texture2);
-    // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load image, create texture and generate mipmaps
-    data = stbi_load("E:\\personal project\\Devendra-Engine\\engine\\misc\\textures\\awesomeface.png", &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        // note that the awesomeface.png has transparency and thus an alpha channel, so make sure to tell OpenGL the data type is of GL_RGBA
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
+    Devendra_Texture texture2 = CreateTexture("E:\\personal project\\Devendra-Engine\\engine\\misc\\textures\\awesomeface.png");
+    if(LoadTexture(&texture2)) 
     {
        MessageBox
             (
@@ -216,70 +193,29 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
                 MB_OK|MB_ICONERROR
             );
     }
-    stbi_image_free(data);
 
-    // real32 color = {1.0f, 0.0f, 0.0f, 1.0f};
-    // glTexParameterfv();
-
-    uint32 verticesCount = (uint32)(sizeof(vertices)/sizeof(vertices[0]));
-    uint32 indiciesCount = (uint32)(sizeof(indices)/sizeof(indices[0]));  
-    
-    // Vertex Array Object
-    uint32 VAO;
-    glGenVertexArrays(1, &VAO); 
-    glBindVertexArray(VAO);
-
-    // Vertex Buffer Object
-    uint32 VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(real32), (void*)0);
-    glEnableVertexAttribArray(0);
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(real32), (void*)(3* sizeof(float)));
-    glEnableVertexAttribArray(1);
-    // Texture attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(real32), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);  
-
-    // Element Buffer Object
-    uint32 EBO;
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);   
-
-    glVertexAttribPointer(0, verticesCount, GL_FLOAT, GL_FALSE, verticesCount * sizeof(real32), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    Devendra_Shader simple_shader;
-    simple_shader = {};
-    CompileFragmentShader(&simple_shader, "E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultfragment.glsl");
-    CompileVertexShader(&simple_shader, "E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultvertex.glsl");
-    CompileShaderProgram(&simple_shader);
-    useShader(&simple_shader);
+    RendererLoadShader(&renderer, &simple_shader);
+    RendererUseShader(&renderer);
 
     // Set the Texture variables locations for fragment shader
-    setUniform1i(&simple_shader, "texture1", 0);
-    setUniform1i(&simple_shader, "texture2", 1);
-
+    ShaderSetInt(renderer.DShader, "texture1", 0);
+    ShaderSetInt(renderer.DShader, "texture2", 1);
+    
     mat4x4 trans = {};
-    uint32 transformLoc = glGetUniformLocation(simple_shader.ShaderProgramID, "transform");
+    uint32 transformLoc = ShaderGetUniformLocation(renderer.DShader, "transform");
 
     // Vsync
     // 0 - off, 1 - on, -1 - adaptive vsync
-    wglSwapIntervalEXT(-1);
+    SetVSync(ADAPTIVE_VSYNC);
+	
+    Devendra_Clock Clock = {};
+    Devendra_Clock_Init(&Clock);
 
-    LARGE_INTEGER LastCounter;
-	QueryPerformanceCounter(&LastCounter);
-	uint64 LastCycleCount = __rdtsc();
+    RendererClear(&renderer);
+
     while(!done)                                // Loop That Runs Until done=TRUE
     {   
-        LARGE_INTEGER PerformanceCountFrequencyResult;
-	    QueryPerformanceFrequency(&PerformanceCountFrequencyResult);
-	    int64 PerformanceCountFrequency = PerformanceCountFrequencyResult.QuadPart;
+        Devendra_Clock_Start(&Clock);
 
         while (PeekMessage(&msg,NULL,0,0,PM_REMOVE))           // Is There A Message Waiting?
         {
@@ -317,38 +253,29 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
         ////////////////////////////////////////////////////////////////////////////////////////
 
         //////////// Drawing to the Screen /////////////////
-        if(DWindow.wireframe)
-        {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        }
-        else
-        {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        }
-        setUniform1f(&simple_shader, "time", absf(sin(counter)));
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2);
+        ShaderSetFloat(renderer.DShader, "time", absf(sin(counter)));
+        
+        BindTexture(&texture1, GL_TEXTURE0);
+        BindTexture(&texture2, GL_TEXTURE1);
+
+
         trans = rotateZ(-4*360.0f*sin(counter));  // Note: For Variable Rotation
         trans = transMat4x4(trans, vec(sin(counter) * 0.5f, 0.0f, 0.0f));   // Note: For translate along X axis back and forth
         trans = transpose(trans);
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &trans.E[0][0]); // NOTE: How to convert mat4x4 to GLFLoat *
-        useShader(&simple_shader);
-        DrawGLScene(VAO, indiciesCount);              
-        SwapBuffers(DWindow.hDC);
+        
+        RendererDraw(&renderer);
         ////////////////////////////////////////////////////
         
-        uint64 EndCycleCount = __rdtsc();
-        LARGE_INTEGER EndCounter;
-		QueryPerformanceCounter(&EndCounter);
+        
+        Devendra_Clock_Stop(&Clock);
+        Devendra_Clock_Update(&Clock);
 
 		// TODO: Display the value here
-		uint64 CycleElapsed = EndCycleCount - LastCycleCount;
-		int64 CounterElapsed = EndCounter.QuadPart - LastCounter.QuadPart;
-		real32 MSPerFrame = ((1000.0f * (real32)CounterElapsed) / (real32)PerformanceCountFrequency);
-		real32 FPS = (real32)PerformanceCountFrequency / (real32) CounterElapsed;
-		real32 MegaCycles = (real32)(CycleElapsed / (1000.0f * 1000.0f));
+		real32 MSPerFrame = (real32) Clock.delta;
+		real32 FPS = 1.0f / (real32) Clock.delta * (1000.0f * 1000.0f);
+        real32 MegaCycles = (real32)Clock.frequency / (1000.0f * 1000.0f);
+
 
         char* vsync = "OFF";
         if(wglGetSwapIntervalEXT())
@@ -361,15 +288,9 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
 		sprintf_s(Buffer, 250, "Miliseconds/Frame : %fms & FPS: %f Mega CyclesElapsed: %fmc & Vsync=%s\n", MSPerFrame, FPS, MegaCycles, vsync);
 		OutputDebugStringA(Buffer);
 
-		LastCounter = EndCounter;
-		LastCycleCount = EndCycleCount;
-
         counter += 0.8f;
     }
     // Shutdown
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
-    KillGLWindow(&DWindow);                                 
+    KillGLWindow(&DWindow);                               
     return (int32)(msg.wParam);                            
 }

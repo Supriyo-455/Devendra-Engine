@@ -38,6 +38,8 @@ DEVENDRA_WIN32_GL_API bool32 CreateGLWindow(Devendra_Window* DWindow, WNDPROC Wn
 
 typedef struct Devendra_Shader
 {
+    const char* vertexShaderPath;
+    const char* fragmentShaderPath;
     uint32 ShaderProgramID;
     uint32 vertexShaderID;
     uint32 fragmentShaderID;
