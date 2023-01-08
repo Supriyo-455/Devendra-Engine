@@ -9,15 +9,16 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "libs/stb_image.h"
 
-#include "include/Devendra_Clock.h"
-#include "src/Devendra_Clock.cpp"
-
 #include "include/Devendra_Math.h"
 
 #include "include/Devendra_Renderer.h"
 #include "src/Devendra_Renderer.cpp"
 
+#include "include/Devendra_Benchmark.h"
+#include "src/Devendra_Benchmark.cpp"
+
 Devendra_Window DWindow = {};
+Devendra_Benchmark DBenchmark = {};
 
 bool32    keys[256];                                  // Array Used For The Keyboard Routine
 typedef struct mouse{
@@ -207,15 +208,12 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     // Vsync
     // 0 - off, 1 - on, -1 - adaptive vsync
     SetVSync(ADAPTIVE_VSYNC);
-	
-    Devendra_Clock Clock = {};
-    Devendra_Clock_Init(&Clock);
 
     RendererClear(&renderer);
 
     while(!done)                                // Loop That Runs Until done=TRUE
-    {   
-        Devendra_Clock_Start(&Clock);
+    {
+        Devendra_Benchmark_Start(&DBenchmark);
 
         while (PeekMessage(&msg,NULL,0,0,PM_REMOVE))           // Is There A Message Waiting?
         {
@@ -266,16 +264,9 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
         
         RendererDraw(&renderer);
         ////////////////////////////////////////////////////
-        
-        
-        Devendra_Clock_Stop(&Clock);
-        Devendra_Clock_Update(&Clock);
 
-		// TODO: Display the value here
-		real32 MSPerFrame = (real32) Clock.delta;
-		real32 FPS = 1.0f / (real32) Clock.delta * (1000.0f * 1000.0f);
-        real32 MegaCycles = (real32)Clock.frequency / (1000.0f * 1000.0f);
-
+		// TODO: Calculate FPS, MSPerFrame, MegaCycles
+        Devendra_Benchmark_End(&DBenchmark);
 
         char* vsync = "OFF";
         if(wglGetSwapIntervalEXT())
@@ -285,7 +276,12 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
 
 		char Buffer[250];
 		// TODO: Optimize this wsprintf or replace it with something else
-		sprintf_s(Buffer, 250, "Miliseconds/Frame : %fms & FPS: %f Mega CyclesElapsed: %fmc & Vsync=%s\n", MSPerFrame, FPS, MegaCycles, vsync);
+		sprintf_s(
+            Buffer, 
+            250, 
+            "Miliseconds/Frame : %fms & FPS: %f Mega CyclesElapsed: %fmc & Vsync=%s\n", 
+            DBenchmark.msPerFrame, DBenchmark.fps, (real32)(DBenchmark.cyclesElapsed / (1000.0f * 1000.0f)), vsync
+        );
 		OutputDebugStringA(Buffer);
 
         counter += 0.8f;

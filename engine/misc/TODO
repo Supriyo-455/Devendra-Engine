@@ -1,6 +1,5 @@
 Working:
     [] Create Platform independent renderer
-    [] Create System clock for engine
     
 TODO(Important):
     [] Create Logging library.
@@ -43,3 +42,4 @@ Completed:
     [] Ship opengl code to a library.
     [] Different translational unit for different files.
     [] Make a math library.
+    [] Create benchmarking details for cpu execution time and performance

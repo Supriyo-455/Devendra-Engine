@@ -17,8 +17,8 @@ Critical:
     []  Renderer abstraction not working for textures
 
 Medium:
-    []  Devendra_Clock not giving the correct result
     []  No centralized build system for making obj and dlls
+    []  Math library doesn't have assertions
 
 Low:
     []  
