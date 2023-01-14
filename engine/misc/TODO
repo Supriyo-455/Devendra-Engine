@@ -12,6 +12,9 @@ TODO(Important):
     [] Keyboard interface (Improve the existing one).
     [] Add Criterion unit testing for code
     [] Migrate math operations to SIMD operations
+    [] Integrate a profiler for execution time measurement.
+    [] Integrate Memory Detection Toolkit for memory corruption checks and memory leaks
+
 
 TODO(Future Upgrade):
     [] Create sound interface with DirectSound.
@@ -42,4 +45,5 @@ Completed:
     [] Ship opengl code to a library.
     [] Different translational unit for different files.
     [] Make a math library.
-    [] Create benchmarking details for cpu execution time and performance
+    [] Created benchmarking details for cpu execution time and performance
+    [] Installed MTuner for memory check Detection

@@ -7,6 +7,7 @@ set CommonCompilerFlags=-nologo -Oi -W4 -FC -Zi -WX -wd4706 -wd4701 -wd4273 -wd4
 set CommonLinkerFlags=OpenGL32.lib GLu32.lib Gdi32.lib User32.lib
 
 IF not exist build mkdir build
+
 pushd build
 cl %CommonCompilerFlags% ..\engine\src\Devendra_Utils.cpp /LD
 cl %CommonCompilerFlags% ..\engine\src\Devendra_Win32_GL_EXT.cpp /LD /link %CommonLinkerFlags%

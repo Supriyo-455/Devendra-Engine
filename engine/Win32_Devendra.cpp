@@ -145,6 +145,7 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     
     // Supported OpenGL extension
     PrintSupportedOpenGLExtensions();
+    InitGLFunctions(DWindow.hDC, DWindow.hRC);
 
     // TODO: Pull out the vertex buffer object related code from here!!
     //  Vertex data
@@ -159,18 +160,22 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
         0, 1, 3, // first triangle
         1, 2, 3  // second triangle
     };
+    uint32 vertexCount = sizeof(vertices) / sizeof(vertices[0]);
+    uint32 indexCount = sizeof(indices) / sizeof(indices[0]);
+    uint32 stride = 8 * sizeof(real32);
 
     Devendra_Renderer renderer = {};
     
     Devendra_Shader simple_shader = {};
-    simple_shader.vertexShaderPath = "E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultfragment.glsl";
-    simple_shader.fragmentShaderPath = "E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultvertex.glsl";
+    simple_shader.fragmentShaderPath = "E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultfragment.glsl";
+    simple_shader.vertexShaderPath = "E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultvertex.glsl";
 
     RendererInit(&renderer, &DWindow);
-    RendererBindBuffers(&renderer, vertices, sizeof(vertices) / sizeof(vertices[0]), indices,  sizeof(indices) / sizeof(indices[0]),  8 * sizeof(real32));
-    
+
     // Texture 1
-    Devendra_Texture texture1 = CreateTexture("E:\\personal project\\Devendra-Engine\\engine\\misc\\textures\\awesomeface.png");
+    Devendra_Texture texture1 = {};
+    texture1.texPath = "E:\\personal project\\Devendra-Engine\\engine\\misc\\textures\\wall.jpg";
+    texture1.format = GL_RGB;
     if(LoadTexture(&texture1))
     {
         MessageBox
@@ -183,7 +188,9 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     }
 
     // Texture 2
-    Devendra_Texture texture2 = CreateTexture("E:\\personal project\\Devendra-Engine\\engine\\misc\\textures\\awesomeface.png");
+    Devendra_Texture texture2 = {};
+    texture2.texPath = "E:\\personal project\\Devendra-Engine\\engine\\misc\\textures\\awesomeface.png";
+    texture2.format = GL_RGBA;
     if(LoadTexture(&texture2)) 
     {
        MessageBox
@@ -195,7 +202,17 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
             );
     }
 
-    RendererLoadShader(&renderer, &simple_shader);
+
+    RendererBindBuffers(&renderer, vertices, vertexCount, indices, indexCount, stride);
+    if(!RendererLoadShader(&renderer, &simple_shader)) {
+        MessageBox
+            (
+                NULL,
+                "Failed to load the shader!", 
+                "Error occured!",
+                MB_OK|MB_ICONERROR
+            );
+    }
     RendererUseShader(&renderer);
 
     // Set the Texture variables locations for fragment shader
@@ -208,9 +225,7 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     // Vsync
     // 0 - off, 1 - on, -1 - adaptive vsync
     SetVSync(ADAPTIVE_VSYNC);
-
-    RendererClear(&renderer);
-
+    
     while(!done)                                // Loop That Runs Until done=TRUE
     {
         Devendra_Benchmark_Start(&DBenchmark);
@@ -262,6 +277,8 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
         trans = transpose(trans);
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &trans.E[0][0]); // NOTE: How to convert mat4x4 to GLFLoat *
         
+        
+        RendererUseShader(&renderer);
         RendererDraw(&renderer);
         ////////////////////////////////////////////////////
 
@@ -274,15 +291,15 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
             vsync = "ON";
         }
 
-		char Buffer[250];
-		// TODO: Optimize this wsprintf or replace it with something else
-		sprintf_s(
-            Buffer, 
-            250, 
-            "Miliseconds/Frame : %fms & FPS: %f Mega CyclesElapsed: %fmc & Vsync=%s\n", 
-            DBenchmark.msPerFrame, DBenchmark.fps, (real32)(DBenchmark.cyclesElapsed / (1000.0f * 1000.0f)), vsync
-        );
-		OutputDebugStringA(Buffer);
+		// char Buffer[250];
+		// // TODO: Optimize this wsprintf or replace it with something else
+		// sprintf_s(
+        //     Buffer, 
+        //     250, 
+        //     "Miliseconds/Frame : %fms & FPS: %f Mega CyclesElapsed: %fmc & Vsync=%s\n", 
+        //     DBenchmark.msPerFrame, DBenchmark.fps, (real32)(DBenchmark.cyclesElapsed / (1000.0f * 1000.0f)), vsync
+        // );
+		// OutputDebugStringA(Buffer);
 
         counter += 0.8f;
     }

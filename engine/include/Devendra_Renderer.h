@@ -3,13 +3,13 @@
 #include "defines.h"
 
 #include "Devendra_Utils.h"
+
+#ifdef _WIN32
 #include "Devendra_Win32_GL.h"
 #include "Devendra_Win32_GL_EXT.h"
-
-#ifdef __opengl
-    
-#else
 #endif
+
+// TODO: Abstract out the ways to work with different graphics api
 
 #define VSYNC 1
 #define ADAPTIVE_VSYNC -1
@@ -35,12 +35,12 @@ typedef struct Devendra_Texture
     int channels;
     uint32 format;
     uint32 type;
-    uint8 *pixels;
     uint32 wrapS;
     uint32 wrapT;
     uint32 filterMin;
     uint32 filterMax;
     bool32 active;
+    const char* texPath;
 }Devendra_Texture;
 
 // RendererInit creates the window and initializes the renderer
@@ -55,7 +55,7 @@ void RendererDraw(Devendra_Renderer* renderer);
 // Loads the shader into the renderer
 bool32 RendererLoadShader(Devendra_Renderer* renderer, Devendra_Shader* shader);
 
-// Use the shader
+// Use shader
 void RendererUseShader(Devendra_Renderer* renderer);
 
 // Unload the shader from the renderer
@@ -64,14 +64,11 @@ void RendererUnloadShader(Devendra_Renderer* renderer);
 // Dispose the shader
 void ShaderDispose(Devendra_Shader* shader);
 
-// Loads the texture from the file
-Devendra_Texture CreateTexture(const char* path);
-
 // Loads the texture into the renderer
 bool32 LoadTexture(Devendra_Texture* texture);
 
 // Bind texture to the shader
-void BindTexture(Devendra_Texture* texture, uint32 textureUnit);
+void BindTexture(Devendra_Texture* texture, GLenum textureUnit);
 
 // Unbinds VAO, VBO, EBO
 void UnbindBuffers(Devendra_Renderer* renderer);

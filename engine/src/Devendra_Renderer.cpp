@@ -1,12 +1,17 @@
-#include "../include/Devendra_Renderer.h"
+#include "../include/Devendra_Renderer.h" 
+
+/**
+ * TODO:
+ *  1) Method to delete the buffers from gpu memory
+ *  2) Method to delete the shaders from gpu memory
+ * 
+*/
 
 void RendererInit(Devendra_Renderer* renderer, Devendra_Window* window)
 {
     renderer->DWindow = window;
-   
-    // Init the opengl functions
+    stbi_set_flip_vertically_on_load(true);
     InitGLFunctions(renderer->DWindow->hDC, renderer->DWindow->hRC);
-    InitGL();
 }
 
 void RendererBindBuffers(Devendra_Renderer* renderer, real32 vertices[], uint32 vertexCount, uint32 indices[], uint32 indiciesCount, uint32 stride)
@@ -15,33 +20,39 @@ void RendererBindBuffers(Devendra_Renderer* renderer, real32 vertices[], uint32 
     renderer->indiciesCount = indiciesCount;
     renderer->stride = stride;
     
-    // Vertex Array Object
-    glGenVertexArrays(1, &renderer->VAO);
-    glBindVertexArray(renderer->VAO);
-    
+     // Vertex Array Object
+    uint32 VAO;
+    glGenVertexArrays(1, &VAO); 
+    glBindVertexArray(VAO);
+
     // Vertex Buffer Object
-    glGenBuffers(1, &renderer->VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, renderer->VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(real32), vertices, GL_STATIC_DRAW);
+    uint32 VBO;
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
     glEnableVertexAttribArray(0);
     // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3* sizeof(real32)));
     glEnableVertexAttribArray(1);
-    // texture coord attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-    
-    // Element Buffer Object
-    glGenBuffers(1, &renderer->EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer->EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indiciesCount * sizeof(uint32), indices, GL_STATIC_DRAW);
+    // Texture attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(real32)));
+    glEnableVertexAttribArray(2);  
 
-    glBindVertexArray(0);
+    // Element Buffer Object
+    uint32 EBO;
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);   
+
     glVertexAttribPointer(0, vertexCount, GL_FLOAT, GL_FALSE, vertexCount * sizeof(real32), (void*)0);
     glEnableVertexAttribArray(0);
+    
+    renderer->VAO = VAO;
+    renderer->VBO = VBO;
+    renderer->EBO = EBO;
 }
 
 void RendererDraw(Devendra_Renderer* renderer)
@@ -54,16 +65,17 @@ void RendererDraw(Devendra_Renderer* renderer)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);         // Clear The Screen And The Depth Buffer
+    glLoadIdentity();                                           // Reset The Current Modelview Matrix
     glBindVertexArray(renderer->VAO);
     glDrawElements(GL_TRIANGLES, renderer->indiciesCount, GL_UNSIGNED_INT, 0);
-    SwapBuffers(renderer->DWindow->hDC);
     glBindVertexArray(0);
+    SwapBuffers(renderer->DWindow->hDC);
 }
 
 bool32 RendererLoadShader(Devendra_Renderer* renderer, Devendra_Shader* shader)
 {
     renderer->DShader = shader;
-    renderer->DShader->active = true;
     const char* vertexShaderSource = readFile(renderer->DShader->vertexShaderPath);
     const char* fragmentShaderSource = readFile(renderer->DShader->fragmentShaderPath);
 
@@ -72,23 +84,49 @@ bool32 RendererLoadShader(Devendra_Renderer* renderer, Devendra_Shader* shader)
     glShaderSource(renderer->DShader->vertexShaderID, 1, &vertexShaderSource, NULL);
     glCompileShader(renderer->DShader->vertexShaderID);
     bool32 success = false;
+    char infoLog[512];
     glGetShaderiv(renderer->DShader->vertexShaderID, GL_COMPILE_STATUS, &success);
-    if(!success) return false;
+    if(!success)
+    {
+        glGetShaderInfoLog(renderer->DShader->vertexShaderID, 512, NULL, infoLog);
+        char Buffer[512];
+        sprintf_s(Buffer, 512, "\nERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s", infoLog);
+        OutputDebugStringA(Buffer);
+        renderer->DShader->vertexShaderID = NULL;
+        return false;
+    }
 
     renderer->DShader->fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(renderer->DShader->fragmentShaderID, 1, &fragmentShaderSource, NULL);
     glCompileShader(renderer->DShader->fragmentShaderID);
     glGetShaderiv(renderer->DShader->fragmentShaderID, GL_COMPILE_STATUS, &success);
-    if(!success) return false;
+    if(!success)
+    {
+        glGetShaderInfoLog(renderer->DShader->fragmentShaderID, 512, NULL, infoLog);
+        char Buffer[512];
+        sprintf_s(Buffer, 512, "\nERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s", infoLog);
+        OutputDebugStringA(Buffer);
+        renderer->DShader->fragmentShaderID = NULL;
+        return false;
+    }
     
     renderer->DShader->ShaderProgramID = glCreateProgram();
     glAttachShader(renderer->DShader->ShaderProgramID, renderer->DShader->vertexShaderID);
     glAttachShader(renderer->DShader->ShaderProgramID, renderer->DShader->fragmentShaderID);
-    
-    glUseProgram(renderer->DShader->ShaderProgramID);
     glLinkProgram(renderer->DShader->ShaderProgramID);
+    glGetProgramiv(renderer->DShader->ShaderProgramID, GL_LINK_STATUS, &success);
+    if(!success) {
+        glGetProgramInfoLog(renderer->DShader->ShaderProgramID, 512, NULL, infoLog);
+        char Buffer[512];
+        sprintf_s(Buffer, 512, "\nERROR::SHADER::PROGRAM::COMPILATION_FAILED\n%s", infoLog);
+        OutputDebugStringA(Buffer);
+        renderer->DShader->ShaderProgramID = NULL;
+        return false;
+    } 
+
     
-    glDeleteShader(renderer->DShader->vertexShaderID);
+     // Delete the shader objects from cpu memory
+    glDeleteShader(renderer->DShader->vertexShaderID);                               
     glDeleteShader(renderer->DShader->fragmentShaderID);
 
     return true;
@@ -96,54 +134,64 @@ bool32 RendererLoadShader(Devendra_Renderer* renderer, Devendra_Shader* shader)
 
 void RendererUseShader(Devendra_Renderer* renderer)
 {
-    
+    glUseProgram(renderer->DShader->ShaderProgramID);
+    renderer->DShader->active = true;
 }
 
 void RendererUnloadShader(Devendra_Renderer* renderer)
 {
-    glDeleteShader(renderer->DShader->vertexShaderID);
-    glDeleteShader(renderer->DShader->fragmentShaderID);
     glDeleteProgram(renderer->DShader->ShaderProgramID);
     renderer->DShader->active = false;
 }
 
-// TODO: Decouple hardcoded texture attributes
-Devendra_Texture CreateTexture(const char* path)
-{
-    Devendra_Texture texture = {};
-    texture.pixels = stbi_load(path, &texture.width, &texture.height, &texture.channels, 0);
-    if (texture.pixels)
-    {
-        texture.format = GL_RGB;
-        texture.type = GL_UNSIGNED_BYTE;
-        texture.wrapS = GL_REPEAT;
-        texture.wrapT = GL_REPEAT;
-        texture.filterMin = GL_LINEAR;
-        texture.filterMax = GL_LINEAR;
-    }
-    return texture;
-}
-
 bool32 LoadTexture(Devendra_Texture* texture)
 {   
-    bool32 flag = texture->pixels != NULL;
+    // TODO: Decouple hard coded texture attributes
+    texture->type = GL_UNSIGNED_BYTE;
+    texture->wrapS = GL_REPEAT;
+    texture->wrapT = GL_REPEAT;
+    texture->filterMin = GL_LINEAR;
+    texture->filterMax = GL_LINEAR;
+
+    GLuint tId;
+    glGenTextures(1, &tId);
+    texture->textureID = tId;
+    
+    glBindTexture(GL_TEXTURE_2D, texture->textureID);
+    
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture->wrapS);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture->wrapT);
+    // set texture filtering parameters   
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texture->filterMin);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texture->filterMax);
+
+    int width, height, nrChannels;
+    uint8* pixels = stbi_load(texture->texPath, &width, &height, &nrChannels, 0);
+    texture->width = width;
+    texture->height = height;
+    texture->channels = nrChannels;
+
+    bool32 flag = (pixels != NULL);
+
     if(flag)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, texture->format, texture->width, texture->height, 0, texture->format, texture->type, texture->pixels);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture->wrapS);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture->wrapT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texture->filterMin);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texture->filterMax);
+        glTexImage2D(GL_TEXTURE_2D, 0, texture->format, texture->width, texture->height, 0, texture->format, texture->type, pixels);
         glGenerateMipmap(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, 0);
+    }else
+    {
+        char errorMessage[256];
+        sprintf_s(errorMessage, "Failed to load texture %s. Reason: %s", texture->texPath, stbi_failure_reason());
+        OutputDebugStringA(errorMessage);
     }
-    stbi_image_free(texture->pixels);
+
+    stbi_image_free(pixels);
     return !flag;
 }
 
-void BindTexture(Devendra_Texture* texture, uint32 textureUnit)
+void BindTexture(Devendra_Texture* texture, GLenum textureUnit)
 {
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(textureUnit);
     glBindTexture(GL_TEXTURE_2D, texture->textureID);
     texture->active = true;
 }
@@ -157,7 +205,7 @@ void UnbindBuffers(Devendra_Renderer* renderer)
 
 void RendererClear(Devendra_Renderer* renderer)
 {
-    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
