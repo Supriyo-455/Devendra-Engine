@@ -138,10 +138,11 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
         return 0;                           // Quit If Window Was Not Created
     }
 
-    
+    InitGLFunctions(DWindow.hDC, DWindow.hRC);
+
     // Supported OpenGL extension
     PrintSupportedOpenGLExtensions();
-    InitGLFunctions(DWindow.hDC, DWindow.hRC);
+    
 
     // TODO: Pull out the vertex buffer object related code from here!!
     //  Vertex data
