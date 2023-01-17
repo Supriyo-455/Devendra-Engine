@@ -21,10 +21,6 @@ pushd build
 
 set src=..\engine\src
 
-rem compiling Devendra_Benchmark
-set file=%src%\benchmark\Devendra_Benchmark.cpp
-cl %CommonCompilerFlags% %file% /LD
-
 rem compiling commons
 set file=%src%\common\Devendra_Utils.cpp
 cl %CommonCompilerFlags% %file% /LD
@@ -36,8 +32,6 @@ set file=%src%\win32\Devendra_Win32_GL.cpp
 cl %CommonCompilerFlags% %file%  /LD /link %CommonLinkerFlags% Devendra_Win32_GL_EXT.lib Devendra_Utils.lib
 
 rem compiling Devendra_Renderer
-set file=%src%\renderer\Devendra_Renderer.cpp
-cl %CommonCompilerFlags% %file% /LD /link %CommonLinkerFlags% Devendra_Win32_GL.lib Devendra_Utils.lib Devendra_Benchmark.lib Devendra_Win32_GL_EXT.lib 
 
 rem building Devendra executable
 set file=%src%\Win32_Devendra.cpp

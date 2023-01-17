@@ -1,9 +1,5 @@
 #include "Devendra_Utils.h"
 
-#include <stdio.h>
-#include <malloc.h>
-#include "defines.h"
-
 const char* readFile(const char *filePath)
 {
     FILE* shaderFile;
@@ -28,4 +24,31 @@ const char* readFile(const char *filePath)
     fclose(shaderFile);
     shaderCode[fileSize] = '\0';
     return shaderCode;
+}
+
+
+void Devendra_Benchmark_Start(Devendra_Benchmark* benchmark)
+{
+    LARGE_INTEGER frequency, counter; 
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&counter);
+
+    benchmark->lastCycle = __rdtsc();
+    benchmark->lastCounter = counter.QuadPart;
+    benchmark->frequency = frequency.QuadPart;
+    benchmark->cyclesElapsed = 0;
+    benchmark->counterElapsed = 0;
+    benchmark->msPerFrame = 0;
+    benchmark->fps = 0;
+}
+
+void Devendra_Benchmark_End(Devendra_Benchmark* benchmark)
+{
+    LARGE_INTEGER counter;
+    QueryPerformanceCounter(&counter);
+
+    benchmark->cyclesElapsed = __rdtsc() - benchmark->lastCycle;
+    benchmark->counterElapsed = counter.QuadPart - benchmark->lastCounter;
+    benchmark->msPerFrame = ((real32)benchmark->counterElapsed * 1000.0f) / (real32)benchmark->frequency;
+    benchmark->fps = (real32)benchmark->frequency / (real32)benchmark->counterElapsed;
 }

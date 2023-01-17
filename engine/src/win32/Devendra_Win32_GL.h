@@ -28,13 +28,14 @@ typedef struct Devendra_Window
     int16           width; 
     int16           height; 
     int16           bits;
+    WNDPROC         WndProc;
 }Devendra_Window;
 
 DEVENDRA_WIN32_GL_API void ReSizeGLScene(int width, int height);
 DEVENDRA_WIN32_GL_API bool32 InitGL(void);
 DEVENDRA_WIN32_GL_API int32 DrawGLScene(uint32 VAO, uint32 indiciesCount);
 DEVENDRA_WIN32_GL_API GLvoid KillGLWindow(Devendra_Window* DWindow);
-DEVENDRA_WIN32_GL_API bool32 CreateGLWindow(Devendra_Window* DWindow, WNDPROC WndProc);
+DEVENDRA_WIN32_GL_API bool32 CreateGLWindow(Devendra_Window* DWindow);
 
 typedef struct Devendra_Shader
 {
