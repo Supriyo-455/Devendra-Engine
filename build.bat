@@ -19,23 +19,15 @@ IF not exist build mkdir build
 
 pushd build
 
-set src=..\engine\src
+set src=..\engine\code
 
 rem compiling commons
-set file=%src%\common\Devendra_Utils.cpp
+set file=%src%\Devendra_Utils.cpp
 cl %CommonCompilerFlags% %file% /LD
-
-rem compiling Devendra_Win32 utils
-set file=%src%\win32\Devendra_Win32_GL_EXT.cpp
-cl %CommonCompilerFlags% %file%  /LD /link %CommonLinkerFlags%
-set file=%src%\win32\Devendra_Win32_GL.cpp
-cl %CommonCompilerFlags% %file%  /LD /link %CommonLinkerFlags% Devendra_Win32_GL_EXT.lib Devendra_Utils.lib
-
-rem compiling Devendra_Renderer
 
 rem building Devendra executable
 set file=%src%\Win32_Devendra.cpp
-cl %CommonCompilerFlags% %file% /link %CommonLinkerFlags% Devendra_Renderer.lib Devendra_Win32_GL.lib Devendra_Utils.lib Devendra_Benchmark.lib Devendra_Win32_GL_EXT.lib 
+cl %CommonCompilerFlags% %file% /link %CommonLinkerFlags% Devendra_Utils.lib
 
 @echo:
 @echo Executables are built in build folder.

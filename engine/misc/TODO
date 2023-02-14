@@ -14,6 +14,7 @@ TODO(Important):
     [] Migrate math operations to SIMD operations
     [] Integrate a profiler for execution time measurement.
     [] Integrate Memory Detection Toolkit for memory corruption checks and memory leaks
+    [] Seperate Codebase on chunks needed to be compiled seperately.
 
 
 TODO(Future Upgrade):
@@ -24,6 +25,7 @@ TODO(Future Upgrade):
     [] Improve the build.bat file
     [] Refactor the codebase.
     [] Implement asin() and acos() function without math.h
+    [] Create RayTracer for the engine
     
 Backlog:
     [] Move from C style to Object Oriented C++ style?
@@ -43,7 +45,7 @@ Completed:
     [] Implement a colorful triangle with rainbow color.
     [] Textures in opengl.
     [] Ship opengl code to a library.
-    [] Different translational unit for different files.
+    [] Different translational unit for different files.    // BAD IDEA !!!
     [] Make a math library.
     [] Created benchmarking details for cpu execution time and performance
     [] Installed MTuner for memory check Detection

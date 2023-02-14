@@ -1,42 +1,15 @@
-#include <time.h>
-
-#include "common/defines.h"
-#include "common/Devendra_Utils.h"
-#include "../libs/Win32_Keycodes.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "../libs/stb_image.h"
-
-#include "win32/Devendra_Win32_GL.h"
-#include "win32/Devendra_Win32_GL_EXT.h"
-
-#include "math/Devendra_Math.h"
+#include "Win32_Devendra.h"
 
 Devendra_Window DWindow = {};
 Devendra_Benchmark DBenchmark = {};
 
 bool32    keys[256];                                  // Array Used For The Keyboard Routine
 
-typedef struct mouse
-{
-	int16 x, y;
-	uint8 buttons;
-} mouse;
-
-enum { 
-    MOUSE_LEFT = 0b1, 
-    MOUSE_MIDDLE = 0b10, 
-    MOUSE_RIGHT = 0b100, 
-    MOUSE_X1 = 0b1000, 
-    MOUSE_X2 = 0b10000 
-};
-
 // TODO: Create seperate API for user input handle
-LRESULT CALLBACK WndProc(   
-                HWND    wHandle,                   // Handle For This Window
-                uint32    uMsg,                   // Message For This Window
-                WPARAM  wParam,                 // Additional Message Information
-                LPARAM  lParam)                 // Additional Message Information
+LRESULT CALLBACK WndProc(HWND    wHandle,                   // Handle For This Window
+                         uint32    uMsg,                   // Message For This Window
+                         WPARAM  wParam,                 // Additional Message Information
+                         LPARAM  lParam)                 // Additional Message Information
 {
     switch (uMsg)                               // Check For Windows Messages
     {
@@ -50,7 +23,7 @@ LRESULT CALLBACK WndProc(
             {
                 DWindow.active=FALSE;                   // Program Is No Longer Active
             }
-        
+            
             return 0;                       // Return To The Message Loop
         }
         /* 
@@ -95,15 +68,15 @@ LRESULT CALLBACK WndProc(
             return 0;                       // Jump Back
         }
     }
-
-     // Pass All Unhandled Messages To DefWindowProc
+    
+    // Pass All Unhandled Messages To DefWindowProc
     return DefWindowProc(wHandle,uMsg,wParam,lParam);
 }
 
 int WINAPI WinMain(HINSTANCE   Instance,              // Instance
-                    HINSTANCE   hPrevInstance,              // Previous Instance
-                    LPSTR       lpCmdLine,              // Command Line Parameters
-                    int         nCmdShow)               // Window Show State
+                   HINSTANCE   hPrevInstance,              // Previous Instance
+                   LPSTR       lpCmdLine,              // Command Line Parameters
+                   int         nCmdShow)               // Window Show State
 {
     /// @brief  TODO: Use this in future?
     /// @param Instance 
@@ -115,11 +88,11 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     hPrevInstance;
     lpCmdLine;
     nCmdShow;
-
+    
     MSG msg;                                // Windows Message Structure
     bool32 done=FALSE;                         // Bool Variable To Exit Loop
     float counter = 0.0f;
-
+    
     DWindow.title = "Devendra Engine";
     DWindow.width = 640;
     DWindow.height = 480;
@@ -129,14 +102,14 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     // Ask The User Which Screen Mode They Prefer
     if 
     (
-        MessageBox
-            (
-                NULL,
-                "Would You Like To Run In Fullscreen Mode?", 
-                "Start FullScrseen?",
-                MB_YESNO|MB_ICONQUESTION
-            )   ==  IDNO
-    )
+     MessageBox
+     (
+      NULL,
+      "Would You Like To Run In Fullscreen Mode?", 
+      "Start FullScrseen?",
+      MB_YESNO|MB_ICONQUESTION
+      )   ==  IDNO
+     )
     {
         DWindow.fullscreen = false;                       // Windowed Mode
     }
@@ -146,19 +119,19 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     {
         return 0;                           // Quit If Window Was Not Created
     }
-
+    
     // Init the opengl functions
     InitGLFunctions(DWindow.hDC, DWindow.hRC);
-
+    
     // Supported OpenGL extension
     PrintSupportedOpenGLExtensions();
-
+    
     // TODO: Pull out the vertex buffer object related code from here!!
     //  Vertex data
     real32 vertices[] = {
         // positions          // colors           // texture coords
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   2.0f, 2.0f, // top right
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f, // bottom right
+        0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   2.0f, 2.0f, // top right
+        0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f, // bottom right
         -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
         -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 2.0f  // top left 
     };
@@ -173,7 +146,7 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     uint32 texture1;
     glGenTextures(1, &texture1);
     glBindTexture(GL_TEXTURE_2D, texture1); 
-     // set the texture wrapping parameters
+    // set the texture wrapping parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     // set texture filtering parameters
@@ -190,18 +163,18 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     else
     {
         MessageBox
-            (
-                NULL,
-                "Failed to load the texture format!", 
-                "Error occured!",
-                MB_OK|MB_ICONERROR
-            );
+        (
+         NULL,
+         "Failed to load the texture format!", 
+         "Error occured!",
+         MB_OK|MB_ICONERROR
+         );
     }
     stbi_image_free(data);
-
+    
     // Texture 2
     uint32 texture2;
-
+    
     glGenTextures(1, &texture2);
     glBindTexture(GL_TEXTURE_2D, texture2);
     // set the texture wrapping parameters
@@ -220,19 +193,19 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     }
     else
     {
-       MessageBox
-            (
-                NULL,
-                "Failed to load the texture format!", 
-                "Error occured!",
-                MB_OK|MB_ICONERROR
-            );
+        MessageBox
+        (
+         NULL,
+         "Failed to load the texture format!", 
+         "Error occured!",
+         MB_OK|MB_ICONERROR
+         );
     }
     stbi_image_free(data);
-
+    
     // real32 color = {1.0f, 0.0f, 0.0f, 1.0f};
     // glTexParameterfv();
-
+    
     uint32 verticesCount = (uint32)(sizeof(vertices)/sizeof(vertices[0]));
     uint32 indiciesCount = (uint32)(sizeof(indices)/sizeof(indices[0]));  
     
@@ -240,7 +213,7 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     uint32 VAO;
     glGenVertexArrays(1, &VAO); 
     glBindVertexArray(VAO);
-
+    
     // Vertex Buffer Object
     uint32 VBO;
     glGenBuffers(1, &VBO);
@@ -255,28 +228,28 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     glEnableVertexAttribArray(1);
     // Texture attribute
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(real32), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);  
-
+    glEnableVertexAttribArray(2);
+    
     // Element Buffer Object
     uint32 EBO;
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);   
-
+    
     glVertexAttribPointer(0, verticesCount, GL_FLOAT, GL_FALSE, verticesCount * sizeof(real32), (void*)0);
     glEnableVertexAttribArray(0);
-
+    
     Devendra_Shader simple_shader;
     simple_shader = {};
     CompileFragmentShader(&simple_shader, "E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultfragment.glsl");
     CompileVertexShader(&simple_shader, "E:\\personal project\\Devendra-Engine\\engine\\misc\\shader\\defaultvertex.glsl");
     CompileShaderProgram(&simple_shader);
     useShader(&simple_shader);
-
+    
     // Set the Texture variables locations for fragment shader
     setUniform1i(&simple_shader, "texture1", 0);
     setUniform1i(&simple_shader, "texture2", 1);
-
+    
     // Vsync
     // 0 - off, 1 - on, -1 - adaptive vsync
     wglSwapIntervalEXT(-1);
@@ -284,7 +257,7 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
     while(!done)                                // Loop That Runs Until done=TRUE
     {
         Devendra_Benchmark_Start(&DBenchmark);
-
+        
         while (PeekMessage(&msg,NULL,0,0,PM_REMOVE))           // Is There A Message Waiting?
         {
             if (msg.message==WM_QUIT)               // Have We Received A Quit Message?
@@ -301,12 +274,12 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
         {
             done=TRUE;              
         }
-
+        
         if(keys[VK_KEY_W])
         {
             DWindow.wireframe = ~DWindow.wireframe;
         }
-
+        
         if (keys[VK_F1])                    
         {
             keys[VK_F1]=FALSE;              
@@ -319,7 +292,7 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
             }
         }
         ////////////////////////////////////////////////////////////////////////////////////////
-
+        
         //////////// Drawing to the Screen /////////////////
         if(DWindow.wireframe)
         {
@@ -339,26 +312,26 @@ int WINAPI WinMain(HINSTANCE   Instance,              // Instance
         DrawGLScene(VAO, indiciesCount);              
         SwapBuffers(DWindow.hDC);
         ////////////////////////////////////////////////////
-
+        
 		// TODO: Calculate FPS, MSPerFrame, MegaCycles
         Devendra_Benchmark_End(&DBenchmark);
-
+        
         char* vsync = "OFF";
         if(wglGetSwapIntervalEXT())
         {
             vsync = "ON";
         }
-
+        
 		char Buffer[250];
 		// TODO: Optimize this wsprintf or replace it with something else
 		sprintf_s(
-            Buffer, 
-            250, 
-            "Miliseconds/Frame : %fms & FPS: %f Mega CyclesElapsed: %fmc & Vsync=%s\n", 
-            DBenchmark.msPerFrame, DBenchmark.fps, (real32)(DBenchmark.cyclesElapsed / (1000.0f * 1000.0f)), vsync
-        );
+                  Buffer, 
+                  250, 
+                  "Miliseconds/Frame : %fms & FPS: %f Mega CyclesElapsed: %fmc & Vsync=%s\n", 
+                  DBenchmark.msPerFrame, DBenchmark.fps, (real32)(DBenchmark.cyclesElapsed / (1000.0f * 1000.0f)), vsync
+                  );
 		OutputDebugStringA(Buffer);
-
+        
         counter += 0.8f;
     }
     // Shutdown

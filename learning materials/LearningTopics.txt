@@ -1,0 +1,31 @@
+## C++
+[] Move schematics
+[] RValue & LValue
+[] Smart pointers
+
+
+## Computer graphics
+[] Image front and back buffers
+[] Depth Buffers
+[] Stencil Buffers
+[] Texture maps and Bump maps
+[] Object space, World space, Camera space
+[] Object space to camera space transformation
+[] Object space to world space transformation
+[] model-view transformation
+[] projection transformation
+[] homogeneous-clip space
+[] normalized device coordinates (NDC)
+[] viewport transformation
+[] per-pixel lighting
+[] rasterization
+[] face culling
+[] fragment shading or pixel shading
+[] pixel ownership test
+[] scissor test
+[] scissor rectangle
+[] stencil shadow algorithm
+[] alpha test
+[] stencil test
+[] depth test
+[] blending

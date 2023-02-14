@@ -1,17 +1,12 @@
 #pragma once
 
-#include "../common/defines.h"
+#include "defines.h"
 #include <windows.h>                              // Header File For Windows
 #include <gl/gl.h>                                // Header File For The OpenGL32 Library
 #include <gl/glu.h>                               // Header File For The GLu32 Library
-#include "../../libs/glext.h"                             // OpenGL 1.2 and above compatibility profile and extension interfaces
-#include "../../libs/wglext.h"                            // WGL extension interfaces.
-
-#ifdef __DEVENDRA_GL_EXT_EXPORTS__
-    #define DEVENDRA_GL_EXT   __declspec(dllexport)
-#else
-   #define DEVENDRA_GL_EXT    __declspec(dllimport)
-#endif
+#include "libs/glext.h"                             // OpenGL 1.2 and above compatibility profile and extension interfaces
+#include "libs/wglext.h"                            // WGL extension interfaces.
+#include <stdio.h>
 
 PFNGLUSEPROGRAMPROC glUseProgram;
 PFNGLGENBUFFERSPROC glGenBuffers;
@@ -54,9 +49,59 @@ PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
 PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 PFNGLDELETEPROGRAMPROC glDeleteProgram;
 
-DEVENDRA_GL_EXT void *GetAnyGLFuncAddress(const char *name);
-DEVENDRA_GL_EXT bool32 IsExtensionSupported(const char *extension_name);
-DEVENDRA_GL_EXT void PrintSupportedOpenGLExtensions();
+void *GetAnyGLFuncAddress(const char *name)             // Platform Specific Function Retrieval
+{
+  void *p = (void *)wglGetProcAddress(name);
+  if(p == 0 ||
+    (p == (void*)0x1) || (p == (void*)0x2) || (p == (void*)0x3) ||
+    (p == (void*)-1) )
+  {
+    HMODULE module = LoadLibraryA("opengl32.dll");
+    p = (void *)GetProcAddress(module, name);
+  }
+
+  return p;
+}
+
+bool32 IsExtensionSupported(const char *name)
+{
+    int32 n=0; 
+    glGetIntegerv(GL_NUM_EXTENSIONS, &n); 
+    for (int32 i=0; i<n; i++) 
+    { 
+        const char* extension = (const char*)glGetStringi(GL_EXTENSIONS, i);
+        if (!strcmp(name, extension)) 
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void PrintSupportedOpenGLExtensions()
+{
+    int32 n=0; 
+    glGetIntegerv(GL_NUM_EXTENSIONS, &n);
+    glGetStringi = (PFNGLGETSTRINGIPROC)wglGetProcAddress("glGetStringi");
+    char Buffer[250];
+    
+    sprintf_s(Buffer, 250, "\nOpengl Version: %s\n", glGetString(GL_VERSION));
+    OutputDebugStringA(Buffer);
+    
+    int32 nrAttributes;
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+    sprintf_s(Buffer, 250, "\nMaximum %d no.s of vertex attributes supported.\n\n", nrAttributes);
+    OutputDebugStringA(Buffer);
+
+    for (int32 i=0; i<n; i++) 
+    { 
+        const char* extension = 
+            (const char*)glGetStringi(GL_EXTENSIONS, i);
+      // TODO: Optimize this wsprintf or replace it with something else
+      sprintf_s(Buffer, 250, "Ext %d: %s\n", i, extension);
+      OutputDebugStringA(Buffer);
+    } 
+}
 
 void InitGLFunctions(HDC hDC, HGLRC hRC) 
 {

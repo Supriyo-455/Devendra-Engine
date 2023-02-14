@@ -1,5 +1,7 @@
 #include "Devendra_Win32_GL.h"
 
+// TODO: Probably use different translational unit for this 
+
 bool32 CreateGLWindow(Devendra_Window* DWindow)
 {
     uint32      PixelFormat;                        // Holds The Results After Searching For A Match
