@@ -9,11 +9,7 @@
 
 /*
     TODO: 
-        1) Matrix transpose
-        2) Orthogonal vectors check
-        3) Projection of vector
-        4) Normalization of vector
-        5) power(double, double) without math.h
+            * Inverse of matrix
 
 */
 
@@ -21,6 +17,11 @@ typedef struct mat4x4
 {
     real32 E[4][4];
 }mat4x4;
+
+typedef struct mat3x3
+{
+    real32 E[3][3];
+}mat3x3;
 
 inline mat4x4 identity()
 {
@@ -108,10 +109,22 @@ inline mat4x4 operator+(mat4x4 A, mat4x4 B)
     return R;
 }
 
+inline bool operator==(mat4x4 A, mat4x4 B)
+{
+    for(int r=0; r<4; r++)
+    {
+        for(int c=0; c<4; c++)
+        {
+            if(A.E[r][c] != B.E[r][c]) return false;
+        }
+    }
+    return true;
+}
+
 inline mat4x4 rotateZ(real32 deg)
 {   
-    real32 sinval = sin(deg);
-    real32 cosval = cos(deg);
+    real32 sinval = sinf(deg);
+    real32 cosval = cosf(deg);
     mat4x4 rMat = 
     {
         {
@@ -126,8 +139,8 @@ inline mat4x4 rotateZ(real32 deg)
 
 inline mat4x4 rotateX(real32 deg)
 {   
-    real32 sinval = sin(deg);
-    real32 cosval = cos(deg);
+    real32 sinval = sinf(deg);
+    real32 cosval = cosf(deg);
     mat4x4 rMat = 
     {
         {
@@ -169,6 +182,50 @@ inline mat4x4 projection(real32 AspectWithOverHeight, real32 FocalLength)
     };
 
     return R;
+}
+
+inline mat3x3 cofactor(mat4x4 mat, int row, int col)
+{
+    mat3x3 Result = {};
+    int r = 0, c = 0;
+    for(int i=0; i<4; i++)
+    {
+        if(i == row) continue;
+        for(int j=0; j<4; j++)
+        {
+            if(j == col) continue;
+            Result.E[r][c] = mat.E[i][j];
+            c++;
+        }
+        r++;
+    }
+    return Result;
+}
+
+inline real32 det(mat3x3 mat)
+{
+    return (  
+                mat.E[0][0] * (mat.E[1][1] * mat.E[2][2] - mat.E[1][2] * mat.E[2][1]) 
+                + mat.E[0][1] * (mat.E[1][2] * mat.E[2][0] - mat.E[1][0] * mat.E[2][2])
+                + mat.E[0][2] * (mat.E[1][0] * mat.E[2][1] - mat.E[1][1] * mat.E[2][0])
+            );
+}
+
+inline real32 det(mat4x4 mat)
+{
+    real32 Result =  mat.E[0][3] * mat.E[1][2] * mat.E[2][1] * mat.E[3][0] - mat.E[0][2] * mat.E[1][3] * mat.E[2][1] * mat.E[3][0] -
+         mat.E[0][3] * mat.E[1][1] * mat.E[2][2] * mat.E[3][0] + mat.E[0][1] * mat.E[1][3] * mat.E[2][2] * mat.E[3][0] +
+         mat.E[0][2] * mat.E[1][1] * mat.E[2][3] * mat.E[3][0] - mat.E[0][1] * mat.E[1][2] * mat.E[2][3] * mat.E[3][0] -
+         mat.E[0][3] * mat.E[1][2] * mat.E[2][0] * mat.E[3][1] + mat.E[0][2] * mat.E[1][3] * mat.E[2][0] * mat.E[3][1] +
+         mat.E[0][3] * mat.E[1][0] * mat.E[2][2] * mat.E[3][1] - mat.E[0][0] * mat.E[1][3] * mat.E[2][2] * mat.E[3][1] -
+         mat.E[0][2] * mat.E[1][0] * mat.E[2][3] * mat.E[3][1] + mat.E[0][0] * mat.E[1][2] * mat.E[2][3] * mat.E[3][1] +
+         mat.E[0][3] * mat.E[1][1] * mat.E[2][0] * mat.E[3][2] - mat.E[0][1] * mat.E[1][3] * mat.E[2][0] * mat.E[3][2] -
+         mat.E[0][3] * mat.E[1][0] * mat.E[2][1] * mat.E[3][2] + mat.E[0][0] * mat.E[1][3] * mat.E[2][1] * mat.E[3][2] +
+         mat.E[0][1] * mat.E[1][0] * mat.E[2][3] * mat.E[3][2] - mat.E[0][0] * mat.E[1][1] * mat.E[2][3] * mat.E[3][2] -
+         mat.E[0][2] * mat.E[1][1] * mat.E[2][0] * mat.E[3][3] + mat.E[0][1] * mat.E[1][2] * mat.E[2][0] * mat.E[3][3] +
+         mat.E[0][2] * mat.E[1][0] * mat.E[2][1] * mat.E[3][3] - mat.E[0][0] * mat.E[1][2] * mat.E[2][1] * mat.E[3][3] -
+         mat.E[0][1] * mat.E[1][0] * mat.E[2][2] * mat.E[3][3] + mat.E[0][0] * mat.E[1][1] * mat.E[2][2] * mat.E[3][3];
+    return Result;
 }
 
 #endif

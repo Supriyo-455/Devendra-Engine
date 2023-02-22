@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <assert.h>
 
 typedef uint8_t uint8;
 typedef uint16_t uint16;

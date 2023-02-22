@@ -5,6 +5,8 @@
 
 #include <math.h>
 
+// TODO: Cross product
+
 typedef union vec2
 {
     real32 E[2];
@@ -24,7 +26,7 @@ inline vec2 vec(real32 x, real32 y)
 
 inline vec2 operator-(vec2 A)
 {
-    vec2 Result;
+    vec2 Result = {};
     Result.x = -A.x;
     Result.y = -A.y;
     return Result;
@@ -32,7 +34,7 @@ inline vec2 operator-(vec2 A)
 
 inline vec2 operator+(vec2 A, vec2 B)
 {
-    vec2 Result;
+    vec2 Result = {};
     Result.x = A.x + B.x;
     Result.y = A.y + B.y;
     return Result;
@@ -40,7 +42,7 @@ inline vec2 operator+(vec2 A, vec2 B)
 
 inline vec2 operator-(vec2 A, vec2 B)
 {
-    vec2 Result;
+    vec2 Result = {};
     Result.x = A.x - B.x;
     Result.y = A.y - B.y;
     return Result;
@@ -48,7 +50,7 @@ inline vec2 operator-(vec2 A, vec2 B)
 
 inline vec2 operator*(real32 A, vec2 B)
 {
-    vec2 Result;
+    vec2 Result = {};
     Result.x = A*B.x;
     Result.y = A*B.y;
     return Result;
@@ -93,11 +95,17 @@ inline real32 dot(vec2 A, vec2 B)
 
 inline vec2 projection(vec2 P, vec2 Q)
 {
-    // Project of P in Q is => Dot(P, Q) / Mag(Q)
     vec2 Result = {};
     real32 length = dot(P, Q) / magnitude(Q);
     vec2 Qnorm = normalize(Q);
     Result = length * Qnorm;
+    return Result;
+}
+
+inline vec2 perpendicular(vec2 P, vec2 Q)
+{
+    vec2 Result = {};
+    Result = P - projection(P, Q);
     return Result;
 }
 
