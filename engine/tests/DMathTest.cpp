@@ -2,7 +2,7 @@
 #include "../code/DMatrix.h"
 int main()
 {
-    mat4x4 mat = identity();
+    mat4x4 mat = identity4x4();
     assert(det(mat) == 1);
     mat = mat + mat;
     assert(det(transpose(mat)) == det(mat));
@@ -15,6 +15,8 @@ int main()
         }
     };
     assert(mat == mat2);
+    mat4x4 result = mat2 * inverse(mat);
+    assert(result == identity4x4());
     printf("All tests passed!\n");
     std::cin.get();
 }

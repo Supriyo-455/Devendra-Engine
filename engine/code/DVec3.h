@@ -41,7 +41,7 @@ inline vec3 vec(vec2 A, real32 z)
 inline vec3 operator+(vec3 A, vec3 B)
 {
     vec3 Result = {};
-    for(int i=0; i<ArrayCount(B.E); i++)
+    for(int i=0; i<3; i++)
     {
         Result.E[i] = A.E[i] + B.E[i];
     }
@@ -51,7 +51,7 @@ inline vec3 operator+(vec3 A, vec3 B)
 inline vec3 operator-(vec3 A, vec3 B)
 {
     vec3 Result = {};
-    for(int i=0; i<ArrayCount(B.E); i++)
+    for(int i=0; i<3; i++)
     {
         Result.E[i] = A.E[i] - B.E[i];
     }
@@ -61,7 +61,7 @@ inline vec3 operator-(vec3 A, vec3 B)
 inline vec3 operator*(real32 a, vec3 V)
 {
     vec3 Result = {};
-    for(int i=0; i<ArrayCount(V.E); i++)
+    for(int i=0; i<3; i++)
     {
         Result.E[i] = V.E[i] * a;
     }
@@ -71,7 +71,7 @@ inline vec3 operator*(real32 a, vec3 V)
 inline real32 magnitude(vec3 A)
 {
     real32 Result = 0.0f;
-    for(int i=0; i<ArrayCount(A.E); i++)
+    for(int i=0; i<3; i++)
     {
         Result += A.E[i] * A.E[i];
     }
@@ -83,7 +83,7 @@ inline vec3 normalize(vec3 A)
 {
     real32 mag = magnitude(A);
     vec3 Result = {};
-    for(int i=0; i<ArrayCount(A.E); i++)
+    for(int i=0; i<3; i++)
     {
         Result.E[i] = A.E[i] / mag;
         
@@ -94,7 +94,7 @@ inline vec3 normalize(vec3 A)
 inline real32 dot(vec3 A, vec3 B)
 {
     real32 Result = 0.0f;
-    for(int i=0; i<ArrayCount(A.E); i++)
+    for(int i=0; i<3; i++)
     {
         Result += A.E[i] * B.E[i];
     }
@@ -103,8 +103,10 @@ inline real32 dot(vec3 A, vec3 B)
 
 inline vec3 cross(vec3 A, vec3 B)
 {
-    // TODO: Implement this!
     vec3 Result = {};
+    Result.x = A.y * B.z - A.z * B.y;
+    Result.y = A.z * B.x - A.x * B.z;
+    Result.z = A.x * B.y - A.y * B.x;
     return Result;
 }
 

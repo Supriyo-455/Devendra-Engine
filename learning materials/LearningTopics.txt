@@ -2,6 +2,12 @@
 [] Move schematics
 [] RValue & LValue
 [] Smart pointers
+[] unions and structures
+[] file handleling
+
+
+## math
+[] wedge product
 
 
 ## Computer graphics
