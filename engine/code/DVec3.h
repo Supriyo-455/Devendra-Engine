@@ -68,6 +68,21 @@ inline vec3 operator*(real32 a, vec3 V)
     return Result;
 }
 
+inline vec3 operator-(vec3 A)
+{
+    return -1.0f * A;
+}
+
+inline vec3 operator/(vec3 V, real32 a)
+{
+    vec3 Result = {};
+    for(int i=0; i<3; i++)
+    {
+        Result.E[i] = V.E[i] / a;
+    }
+    return Result;
+}
+
 inline real32 magnitude(vec3 A)
 {
     real32 Result = 0.0f;
@@ -124,6 +139,11 @@ inline vec3 perpendicular(vec3 P, vec3 Q)
     vec3 Result = {};
     Result = P - projection(P, Q);
     return Result;
+}
+
+inline vec3 lerp(vec3 P, vec3 Q, real32 t)
+{
+    return (1-t) * P + t * Q;
 }
 
 #endif

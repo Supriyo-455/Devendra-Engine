@@ -1,12 +1,13 @@
 Working:
-    [] Create Platform independent renderer
+    [] Barebone Ray tracer
+    [] upgrade math library
     
 TODO(Important):
     [] Create Logging library.
     [] Implement camera.
     [] Remove global window Handles and Opengl Contexts?
-    [] Setup compiler switches for performance counter and wireframing.
-    [] Create Build system using python and sCons
+    [] Setup include path and library path for the compiler.
+    [] Create Build system using python and sCons?
     [] Integreate ImGUI
     [] Mouse interface.
     [] Keyboard interface (Improve the existing one).
@@ -15,7 +16,8 @@ TODO(Important):
     [] Integrate a profiler for execution time measurement.
     [] Integrate Memory Detection Toolkit for memory corruption checks and memory leaks
     [] Seperate Codebase on chunks needed to be compiled seperately.
-
+    [] Remove glex and wglext from the codebase.
+    [] Create Platform independent renderer
 
 TODO(Future Upgrade):
     [] Create sound interface with DirectSound.
@@ -32,20 +34,3 @@ Backlog:
     [] Linux system porting
     [] Create debug interface
     [] Integrate CMAKE for build system
-
-Completed:
-    [] Get a window up and running.
-    [] Use Modern opengl version in Win32 API
-    [] Implement a triangle with modern opengl and win32 API.
-    [] Seperate Fragment shader and Vertex shader to different files
-    [] Seperate OpenGL specific codes.
-    [] Fix Unload Class Error.
-    [] Fix inconsistent framerate and Window messages.
-    [] Vsync and color transition rectangle example.
-    [] Implement a colorful triangle with rainbow color.
-    [] Textures in opengl.
-    [] Ship opengl code to a library.
-    [] Different translational unit for different files.    // BAD IDEA !!!
-    [] Make a math library.
-    [] Created benchmarking details for cpu execution time and performance
-    [] Installed MTuner for memory check Detection

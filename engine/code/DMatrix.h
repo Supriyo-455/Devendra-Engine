@@ -8,8 +8,8 @@
 #include "DVec4.h"
 
 /*
-    TODO: 
-            * Inverse of matrix
+    TODO:
+
 
 */
 
@@ -280,6 +280,7 @@ inline mat3x3 inverse(mat3x3 mat)
     return Result;
 }
 
+// TODO: Bug here need to debug!
 inline mat4x4 inverse(mat4x4 mat)
 {
     vec3 a = vec(mat.E[0][0], mat.E[1][0], mat.E[2][0]);

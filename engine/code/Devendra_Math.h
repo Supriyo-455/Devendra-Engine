@@ -3,18 +3,19 @@
 #include "defines.h"
 #include <math.h>   // TODO: Remove this in future
 
+#define Inf INFINITY
 
-int32 fact(int32 n) {
-    return n <= 0 ? 1 : n * fact(n-1);
+int32 Fact(int32 n) {
+    return n <= 0 ? 1 : n * Fact(n-1);
 }
 
-inline real32 absf(real32 x)
+inline real32 Absf(real32 x)
 {
     if(x < 0) x = -x;
     return x;
 }
 
-inline real32 sin(real32 x){
+inline real32 Sin(real32 x){
     real32 sign=1;
     if (x<0){
         sign=-1.0;
@@ -34,7 +35,7 @@ inline real32 sin(real32 x){
     return sign*res;
 }
 
-inline real32 cos(real32 x){
+inline real32 Cos(real32 x){
     if (x<0) x=-x;
     if (x>360) x -= int32(x/360)*360;
     x*=PI/180.0;
@@ -47,6 +48,15 @@ inline real32 cos(real32 x){
         term*=-x*x/k/(k-1);
     }  
     return res;
+}
+
+inline real32 lerp(real32 v0, real32 v1, real32 t) {
+  return (1 - t) * v0 + t * v1;
+}
+
+inline real32 DegreesToRadians(real32 Degree)
+{
+    return Degree * PI / 180.0f;
 }
 
 #include "DVec2.h"  // NOTE: For vector 2D operations

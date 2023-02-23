@@ -9,7 +9,6 @@
 ## math
 [] wedge product
 
-
 ## Computer graphics
 [] Image front and back buffers
 [] Depth Buffers
@@ -35,3 +34,4 @@
 [] stencil test
 [] depth test
 [] blending
+[] Stratification
