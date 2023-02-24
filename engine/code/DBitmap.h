@@ -76,11 +76,13 @@ image CreateImage(uint32_t Width, uint32_t Height)
     return Image;
 }
 
-uint32 GetOutputColor(vec3 Color, bool32 useGammaCorrection = false)
+uint32 GetOutputColor(vec3 Color, uint32 SamplesPerPixel, bool32 useGammaCorrection = false)
 {
-    real32 r = Color.x;
-    real32 g = Color.y;
-    real32 b = Color.z;
+    real32 Scale = 1.0f / SamplesPerPixel;
+
+    real32 r = Scale * Color.x;
+    real32 g = Scale * Color.y;
+    real32 b = Scale * Color.z;
     if(useGammaCorrection)
     {
         r = LinearTosRGB(Color.x);
@@ -88,9 +90,9 @@ uint32 GetOutputColor(vec3 Color, bool32 useGammaCorrection = false)
         b = LinearTosRGB(Color.z);
     }
     
-    vec4 BMPColor = vec(255.0f*r,
-                        255.0f*g,
-                        255.0f*b,
+    vec4 BMPColor = vec(255.0f* Clamp(r, 0.0f, 0.999f),
+                        255.0f* Clamp(g, 0.0f, 0.999f),
+                        255.0f* Clamp(b, 0.0f, 0.999f),
                         255.0f);
     uint32 BMPValue = BGRAPack4x8(BMPColor);
     return BMPValue;
@@ -119,8 +121,8 @@ void WriteImage(image Image, char* OutputFileName)
     bih.biBitCount = 32;
     bih.biCompression = BI_RGB; // uncompressed 24-bit RGB
     bih.biSizeImage = 0; // can be zero for BI_RGB bitmaps
-    bih.biXPelsPerMeter = 5000; // 96dpi equivalent
-    bih.biYPelsPerMeter = 5000;
+    bih.biXPelsPerMeter = 4000;
+    bih.biYPelsPerMeter = 4000;
     bih.biClrUsed = 0;
     bih.biClrImportant = 0;
     

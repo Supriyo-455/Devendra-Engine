@@ -3,6 +3,8 @@
 #include "defines.h"
 #include <math.h>   // TODO: Remove this in future
 
+#include <cstdlib>
+
 #define Inf INFINITY
 
 int32 Fact(int32 n) {
@@ -57,6 +59,22 @@ inline real32 lerp(real32 v0, real32 v1, real32 t) {
 inline real32 DegreesToRadians(real32 Degree)
 {
     return Degree * PI / 180.0f;
+}
+
+inline real32 Random()
+{
+    return rand() / (RAND_MAX + 1.0f);
+}
+
+inline real32 Random(real32 min, real32 max)
+{
+    return min + (max - min) * Random();
+}
+
+inline real32 Clamp(real32 x, real32 min, real32 max) {
+    if (x < min) return min;
+    if (x > max) return max;
+    return x;
 }
 
 #include "DVec2.h"  // NOTE: For vector 2D operations
