@@ -1,0 +1,2 @@
+#define Devendra_VERSION_MAJOR @Devendra_VERSION_MAJOR@
+#define Devendra_VERSION_MINOR @Devendra_VERSION_MINOR@

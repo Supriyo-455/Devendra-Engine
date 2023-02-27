@@ -16,7 +16,7 @@ IF not exist build mkdir build
 
 pushd build
 
-set src=..\engine\code
+set src=..\engine\code\windows
 
 rem compiling commons
 set file=%src%\Devendra_Utils.cpp
