@@ -1,11 +1,13 @@
 #include <DevendraConfig.h>
 
-#include "Devendra_Math.h"
+#include <GLFW/glfw3.h>
 #include <iostream>
+
+#include "Devendra_Math.h"
+#include "logger/DLogger.h"
 
 int main(int argc, char *argv[])
 {
-    std::cout << "\n"
-              << argv[0] << " VERSION " << Devendra_VERSION_MAJOR << "." << Devendra_VERSION_MINOR << std::endl;
+    Devendra::log(Devendra::INFO, "Hello from Devendra!");
     return 0;
 }

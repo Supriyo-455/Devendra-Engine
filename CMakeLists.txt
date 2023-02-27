@@ -4,12 +4,19 @@ project(Devendra VERSION 1.0)
 
 configure_file(DevendraConfig.h.in DevendraConfig.h)
 
-add_executable(${PROJECT_NAME} engine/code/linux/Devendra.cpp)
+set(LINUXDIR engine/code/linux)
+
+add_executable(
+    ${PROJECT_NAME} 
+    ${LINUXDIR}/Devendra.cpp
+    ${LINUXDIR}/logger/DLogger.cpp
+    ${LINUXDIR}/utils/DUtils.cpp
+)
 
 target_include_directories(
     ${PROJECT_NAME} 
     PUBLIC ${PROJECT_BINARY_DIR}
-    PUBLIC ${PROJECT_SOURCE_DIR}/engine/include
+    PUBLIC ${PROJECT_SOURCE_DIR}/include
 )
 
 add_subdirectory(DevendraMath)
@@ -41,9 +48,9 @@ add_subdirectory(thirdparty/glfw)
 
 target_include_directories(
     ${PROJECT_NAME} 
-    PUBLIC DevendraMath/src
-    PUBLIC DevendraRayTracer/src
-    PUBLIC Sandbox/src 
+    PUBLIC DevendraMath/include
+    PUBLIC DevendraRayTracer/include
+    PUBLIC Sandbox/include 
     PUBLIC thirdparty/glfw/include
 )
 

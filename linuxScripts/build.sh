@@ -1,5 +1,5 @@
 #! /bin/bash
 
-pushd build; 
+cd build; 
 make;
-popd;
+cd ..;
