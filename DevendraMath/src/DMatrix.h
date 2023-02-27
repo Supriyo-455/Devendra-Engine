@@ -1,5 +1,4 @@
-#ifndef __DMATRIX_H__
-#define __DMATRIX_H__
+#pragma once
 
 #include <math.h>
 #include "defines.h"
@@ -322,5 +321,3 @@ inline mat4x4 inverse(mat4x4 mat)
 
     return adj;
 }
-
-#endif
