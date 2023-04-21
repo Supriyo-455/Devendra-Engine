@@ -3,3 +3,11 @@
 /.vs/**
 /testbin/**
 /raytracer/**
+
+bin
+bin-int
+**.sln
+Makefile
+engine/Makefile
+**.vcxproj
+**.vcxproj.user
